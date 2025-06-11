@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gérer le ticket</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%); margin: 0; }
+    .ticket-container {
+      max-width: 600px; margin: 60px auto; padding: 36px 32px; background: #fff;
+      border-radius: 14px; box-shadow: 0 4px 24px #b3c6e0; min-height: 60vh;
+    }
+    h1 { color: #1976d2; font-size: 2em; margin-bottom: 0.5em; }
+    label { display: block; margin-top: 18px; color: #333; font-weight: 500; }
+    input, select, textarea {
+      width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #b3c6e0;
+      border-radius: 5px; font-size: 1em; background: #f9fbfd;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    button {
+      margin-top: 24px; width: 100%; padding: 12px; background: #1976d2; color: #fff;
+      border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; transition: background 0.2s;
+    }
+    button:hover { background: #1251a3; }
+    .success { color: #388e3c; margin-top: 18px; }
+    .error { color: #d32f2f; margin-top: 18px; }
+    .ticket-info { background: #f5faff; border-radius: 8px; padding: 18px; margin-bottom: 18px; box-shadow: 0 2px 8px #e3eaf7; }
+    .reponses { margin-top: 32px; }
+    .reponse-item { background: #e3f0ff; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+    .reponse-meta { color: #1976d2; font-size: 0.95em; margin-bottom: 4px; }
+  </style>
+  <!-- Firebase App (core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <!-- Firebase Auth SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <!-- Firebase Firestore SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="ticket-container">
+    <button onclick="window.history.back()" style="margin-bottom:18px;background:#e3eaf7;color:#1976d2;border:none;border-radius:5px;padding:8px 18px;font-size:1em;cursor:pointer;float:right;">← Retour</button>
+    <h1>Gérer le ticket</h1>
+    <div class="ticket-info" id="ticket-info"></div>
+    <form id="reponse-form">
+      <label for="reponse">Répondre au ticket</label>
+      <textarea id="reponse" name="reponse" placeholder="Votre réponse..." required></textarea>
+      <button type="submit">Envoyer la réponse</button>
+      <div class="success" id="success"></div>
+      <div class="error" id="error"></div>
+    </form>
+    <div class="reponses">
+      <h2>Réponses précédentes</h2>
+      <div id="reponses-list"></div>
+    </div>
+  </div>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Récupérer l'id du ticket depuis l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticketId = urlParams.get('id');
+
+    // Afficher les infos du ticket
+    function afficherTicket() {
+      db.collection('tickets').doc(ticketId).get().then(doc => {
+        if (!doc.exists) {
+          document.getElementById('ticket-info').innerHTML = '<span class="error">Ticket introuvable.</span>';
+          return;
+        }
+        const data = doc.data();
+        document.getElementById('ticket-info').innerHTML = `
+          <b>Entreprise :</b> ${data.company || ''}<br>
+          <b>Titre :</b> ${data.title || ''}<br>
+          <b>Description :</b> ${data.description || ''}<br>
+          <b>Priorité :</b> ${data.priority || ''}<br>
+          <b>Créé le :</b> ${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}<br>
+          <b>Utilisateur :</b> ${data.userEmail || ''}
+        `;
+      });
+    }
+
+    // Afficher les réponses
+    function afficherReponses() {
+      db.collection('tickets').doc(ticketId).collection('reponses').orderBy('createdAt').get().then((querySnapshot) => {
+        const list = document.getElementById('reponses-list');
+        list.innerHTML = '';
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const div = document.createElement('div');
+          div.className = 'reponse-item';
+          div.innerHTML = `<div class='reponse-meta'>${data.userEmail || ''} - ${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</div><div>${data.texte || ''}</div>`;
+          list.appendChild(div);
+        });
+      });
+    }
+
+    afficherTicket();
+    afficherReponses();
+
+    document.getElementById('reponse-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const reponse = document.getElementById('reponse').value.trim();
+      const successDiv = document.getElementById('success');
+      const errorDiv = document.getElementById('error');
+      successDiv.textContent = '';
+      errorDiv.textContent = '';
+      auth.onAuthStateChanged(function(user) {
+        if (!user) {
+          errorDiv.textContent = "Vous devez être connecté pour répondre.";
+          return;
+        }
+        db.collection('tickets').doc(ticketId).collection('reponses').add({
+          texte: reponse,
+          createdAt: new Date(),
+          userId: user.uid,
+          userEmail: user.email
+        })
+        .then(() => {
+          successDiv.textContent = "Réponse envoyée !";
+          document.getElementById('reponse-form').reset();
+          afficherReponses();
+        })
+        .catch((err) => {
+          errorDiv.textContent = "Erreur lors de l'envoi : " + err.message;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
