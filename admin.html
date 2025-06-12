@@ -8,27 +8,62 @@
   <style>
     :root {
       --main-color: #1976d2;
+      --main-gradient: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%);
+      --menu-gradient: linear-gradient(180deg, var(--main-color) 60%, #1565c0 100%);
+      --card-gradient: linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);
+      --shadow: 0 4px 32px #b3c6e0;
+      --radius: 18px;
+      --transition: 0.2s;
     }
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%);
       margin: 0;
       min-height: 100vh;
+      letter-spacing: 0.02em;
     }
     .admin-layout {
       display: flex;
       min-height: 100vh;
+      background: rgba(25, 118, 210, 0.04);
     }
     .admin-menu {
-      width: 240px;
-      background: linear-gradient(180deg, var(--main-color) 60%, #1565c0 100%);
+      width: 260px;
+      background: linear-gradient(180deg, #1976d2 60%, #1565c0 100%);
       color: #fff;
       min-height: 100vh;
-      box-shadow: 2px 0 12px #b3c6e0;
+      box-shadow: 2px 0 24px #b3c6e0;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       padding: 0;
+      border-radius: 0 24px 24px 0;
+      position: relative;
+    }
+    .menu-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 36px 0 20px 0;
+      background: rgba(255,255,255,0.10);
+      border-bottom: 2px solid #1565c0;
+    }
+    .menu-logo img {
+      width: 100px;
+      height: auto;
+      border-radius: 14px;
+      background: #fff;
+      padding: 10px 18px;
+      filter: drop-shadow(0 2px 10px #b3c6e0);
+      margin-bottom: 10px;
+    }
+    .menu-logo span {
+      color: #fff;
+      font-size: 1.15em;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-shadow: 0 1px 2px #1976d2;
     }
     .admin-menu ul {
       list-style: none;
@@ -40,19 +75,23 @@
       border-bottom: 1px solid #1565c0;
     }
     .admin-menu a {
-      display: block;
+      display: flex;
+      align-items: center;
       color: #fff;
       text-decoration: none;
-      padding: 18px 32px;
-      font-size: 1.1em;
-      letter-spacing: 0.5px;
-      transition: background 0.2s, padding-left 0.2s;
+      padding: 22px 40px;
+      font-size: 1.15em;
+      letter-spacing: 0.7px;
+      transition: background 0.18s, padding-left 0.18s, color 0.18s;
       position: relative;
-      border-radius: 0 20px 20px 0;
+      border-radius: 0 22px 22px 0;
+      font-weight: 600;
     }
     .admin-menu a:hover, .admin-menu a.active {
       background: #1251a3;
-      padding-left: 44px;
+      padding-left: 56px;
+      color: #ffe082;
+      box-shadow: 0 2px 12px #1976d2aa;
     }
     .admin-menu a#logout-link {
       color: #ffbdbd;
@@ -60,7 +99,7 @@
       border-top: 1px solid #1251a3;
       margin-top: auto;
       background: #183c5a;
-      transition: background 0.2s;
+      transition: background 0.18s, color 0.18s;
     }
     .admin-menu a#logout-link:hover {
       background: #c62828;
@@ -68,96 +107,163 @@
     }
     .admin-container {
       flex: 1;
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 48px 40px 32px 40px;
+      max-width: 1300px;
+      margin: 48px auto;
+      padding: 64px 56px 44px 56px;
       background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 4px 32px #b3c6e0;
+      border-radius: 28px;
+      box-shadow: 0 8px 40px #b3c6e0, 0 2px 8px #b3c6e0;
       min-height: 80vh;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 32px;
+      position: relative;
     }
     h1 {
-      color: var(--main-color);
-      font-size: 2.3em;
+      color: #1976d2;
+      font-size: 2.7em;
       margin-bottom: 0.2em;
-      font-weight: 700;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-align: center;
+      text-shadow: 0 2px 8px #e3eaf7;
     }
     h2 {
-      color: #333;
+      color: #1976d2;
       font-size: 1.5em;
       margin-top: 20px;
       margin-bottom: 10px;
-      letter-spacing: 0.5px;
-      font-weight: 600;
+      letter-spacing: 0.7px;
+      font-weight: 800;
     }
     #user-info {
       color: #555;
-      font-size: 1.1em;
+      font-size: 1.13em;
       margin-bottom: 18px;
+      text-align: center;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       background: #f9fbfd;
-      border-radius: 10px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 2px 8px #e3eaf7;
+      box-shadow: 0 2px 12px #e3eaf7;
     }
     th, td {
       border: 1px solid #e3eaf7;
-      padding: 14px 12px;
+      padding: 18px 16px;
       text-align: left;
-      font-size: 1em;
+      font-size: 1.08em;
     }
     th {
       background: #e3f0ff;
-      color: var(--main-color);
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      color: #1976d2;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
     }
     tr:nth-child(even) td {
       background: #f5faff;
     }
     tr:hover td {
       background: #e3f0ff;
-      transition: background 0.2s;
+      transition: background 0.18s;
+    }
+    .stat-card {
+      background: linear-gradient(120deg, #f8fafc 80%, #e3eaf7 100%);
+      box-shadow: 0 4px 24px #b3c6e0;
+      border-radius: 18px;
+      padding: 36px 48px;
+      min-width: 220px;
+      text-align: center;
+      margin-bottom: 12px;
+      transition: box-shadow 0.18s, transform 0.12s;
+      border: 2px solid #e3eaf7;
+    }
+    .stat-card:hover {
+      box-shadow: 0 8px 32px #1976d2aa;
+      transform: translateY(-4px) scale(1.04);
+    }
+    .stat-card div:first-child {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #1976d2;
+      margin-bottom: 8px;
+    }
+    .stat-card div:last-child {
+      font-size: 1.18em;
+      color: #333;
     }
     .gerer-ticket-btn, .btn-main {
-      background: linear-gradient(90deg, var(--main-color) 60%, #42a5f5 100%);
+      background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
       color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 10px 26px;
-      font-size: 1em;
+      border-radius: 10px;
+      padding: 14px 34px;
+      font-size: 1.13em;
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 2px 8px #b3c6e0;
-      transition: background 0.2s, transform 0.1s;
+      transition: background 0.18s, transform 0.1s;
       margin: 0 4px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       display: inline-block;
     }
     .gerer-ticket-btn:hover, .btn-main:hover {
-      background: linear-gradient(90deg, #1251a3 60%, var(--main-color) 100%);
+      background: linear-gradient(90deg, #1251a3 60%, #1976d2 100%);
       transform: scale(1.07);
       color: #fff;
     }
-    .form-control, .form-select {
-      border-radius: 8px;
-      border: 1px solid #b3c6e0;
+    .form-control, .form-select, input[type="text"], input[type="email"], textarea {
+      border-radius: 12px;
+      border: 2px solid #b3c6e0;
       font-size: 1.08em;
       background: #f9fbfd;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      transition: border 0.18s, box-shadow 0.18s;
     }
-    .success { color: #388e3c; margin-top: 18px; }
-    .error { color: #d32f2f; margin-top: 18px; }
-    @media (max-width: 1100px) {
-      .admin-container { max-width: 99vw; padding: 20px 2vw; }
-      .admin-menu { width: 140px; }
-      .admin-menu a { font-size: 0.98em; padding: 14px 12px; }
+    .form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+      border: 2px solid #1976d2;
+      background: #f0f6ff;
+      box-shadow: 0 0 0 2px #1976d233;
+      outline: none;
+    }
+    .success {
+      color: #388e3c;
+      margin-top: 18px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 1.13em;
+    }
+    .error {
+      color: #d32f2f;
+      margin-top: 18px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 1.13em;
+    }
+    /* Responsive */
+    @media (max-width: 1300px) {
+      .admin-container { max-width: 99vw; padding: 24px 2vw; }
+      .admin-menu { width: 180px; }
+      .admin-menu a { font-size: 1em; padding: 14px 10px; }
+      .stat-card { padding: 24px 10px; min-width: 120px; }
+    }
+    @media (max-width: 900px) {
+      .admin-layout { flex-direction: column; }
+      .admin-menu { flex-direction: row; width: 100vw; min-height: unset; border-radius: 0 0 24px 24px; }
+      .menu-logo { display: none; }
+      .admin-menu ul { display: flex; flex-direction: row; }
+      .admin-menu li { border-bottom: none; border-right: 1px solid #1565c0; }
+      .admin-menu a { border-radius: 0; padding: 14px 10px; font-size: 0.98em; }
+    }
+    @media (max-width: 700px) {
+      .admin-container { padding: 10px 2vw; }
+      h1 { font-size: 1.3em; }
+      .stat-card { padding: 14px 2px; min-width: 80px; font-size: 0.9em; }
+      th, td { padding: 8px 4px; font-size: 0.95em; }
     }
   </style>
   <!-- Firebase App (core SDK) -->
@@ -171,13 +277,20 @@
 <body>
     <div class="admin-layout">
       <nav class="admin-menu">
+        <div class="menu-logo">
+          <img src="gmp modif.png" alt="Logo GMP">
+          <span>GLOBAL MEDIAS PUB</span>
+        </div>
         <ul>
           <li><a href="#dashboard" id="menu-dashboard">Tableau de bord</a></li>
           <li><a href="#users" id="menu-users">Utilisateurs</a></li>
-          <li><a href="#settings" id="menu-settings">Paramètres</a></li>
-          <li><a href="#tickets" id="menu-tickets">Tickets</a></li>
-          <li><a href="#newsletter" id="menu-newsletter">Créer une newsletter</a></li>
+          <li><a href="#campagnes" id="menu-campagnes">Campagnes</a></li>
           <li><a href="#utilisateur" id="menu-utilisateur">Utilisateurs (tickets)</a></li>
+          <li><a href="#tickets" id="menu-tickets">Tickets</a></li>
+            <li><a href="#newsletter" id="menu-newsletter">Créer une newsletter</a></li>
+            <li><a href="createticket.html" id="menu-createticket">Créer un ticket</a></li>
+            <li><a href="createAnnonceur.html" id="menu-createannonceur">Créer une campagne</a></li>
+          <li><a href="#settings" id="menu-settings">Paramètres</a></li>
           <li><a href="#logout" id="logout-link" style="color:#ffbdbd;">Se déconnecter</a></li>
         </ul>
       </nav>
@@ -202,6 +315,10 @@
             <div class="stat-card" style="background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);box-shadow:0 2px 12px #b3c6e0;border-radius:12px;padding:28px 38px;min-width:180px;text-align:center;">
               <div style="font-size:2.2em;font-weight:bold;color:#1976d2;" id="stat-newsletters">0</div>
               <div style="font-size:1.1em;color:#333;">Newsletters</div>
+            </div>
+            <div class="stat-card" style="background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);box-shadow:0 2px 12px #b3c6e0;border-radius:12px;padding:28px 38px;min-width:180px;text-align:center;">
+              <div style="font-size:2.2em;font-weight:bold;color:#1976d2;" id="stat-campagnes">0</div>
+              <div style="font-size:1.1em;color:#333;">Campagnes</div>
             </div>
           </div>
         </div>
@@ -285,6 +402,26 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           <h2>Historique des newsletters</h2>
           <ul id="newsletter-list"></ul>
         </div>
+        <div id="page-campagnes" style="display:none">
+          <h2>Gestion des campagnes</h2>
+          <table id="campagnes-table" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f0f0f0">
+                <th style="border:1px solid #ccc;padding:8px;">Nom</th>
+                <th style="border:1px solid #ccc;padding:8px;">Début</th>
+                <th style="border:1px solid #ccc;padding:8px;">Fin</th>
+                <th style="border:1px solid #ccc;padding:8px;">Zone</th>
+                <th style="border:1px solid #ccc;padding:8px;">Style</th>
+                <th style="border:1px solid #ccc;padding:8px;">Type</th>
+                <th style="border:1px solid #ccc;padding:8px;">Message</th>
+                <th style="border:1px solid #ccc;padding:8px;">Images</th>
+                <th style="border:1px solid #ccc;padding:8px;">Vidéos</th>
+                <th style="border:1px solid #ccc;padding:8px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
     <script>
@@ -360,6 +497,32 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
         });
       }
 
+      function afficherCampagnes() {
+        db.collection('campagnes').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+          const tbody = document.querySelector('#campagnes-table tbody');
+          tbody.innerHTML = '';
+          querySnapshot.forEach((doc) => {
+            const d = doc.data();
+            const images = (d.images||[]).map(url => `<a href="${url}" target="_blank"><img src="${url}" style="max-width:40px;max-height:40px;border-radius:6px;margin:2px;"></a>`).join('');
+            const videos = (d.videos||[]).map(url => `<a href="${url}" target="_blank">🎬</a>`).join(' ');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td style='border:1px solid #ccc;padding:8px;'>${d.nom||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${d.debut||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${d.fin||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${d.zone||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${d.style||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${d.type||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;max-width:180px;overflow:auto;'>${d.details||''}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${images}</td>
+              <td style='border:1px solid #ccc;padding:8px;'>${videos}</td>
+              <td style='border:1px solid #ccc;padding:8px;'><button class="btn-main" data-id="${doc.id}" onclick="window.location.href='gererCampagne.html?id=${doc.id}'">Voir</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+      }
+
       // Statistiques dashboard
       function chargerStatsDashboard() {
         // Tickets
@@ -367,12 +530,16 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           document.getElementById('stat-tickets').textContent = qs.size;
         });
         // Utilisateurs
-        db.collection('users').get().then((qs) => {
+        db.collection('utilisateur').get().then((qs) => {
           document.getElementById('stat-users').textContent = qs.size;
         });
         // Newsletters
         db.collection('newsletters').get().then((qs) => {
           document.getElementById('stat-newsletters').textContent = qs.size;
+        });
+        // Campagnes
+        db.collection('campagnes').get().then((qs) => {
+          document.getElementById('stat-campagnes').textContent = qs.size;
         });
       }
 
@@ -383,11 +550,13 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
         document.getElementById('page-settings').style.display = page === 'settings' ? '' : 'none';
         document.getElementById('page-newsletter').style.display = page === 'newsletter' ? '' : 'none';
         document.getElementById('page-utilisateur').style.display = page === 'utilisateur' ? '' : 'none';
+        document.getElementById('page-campagnes').style.display = page === 'campagnes' ? '' : 'none';
         if(page === 'users') afficherUtilisateurs();
         if(page === 'tickets') afficherTickets();
         if(page === 'newsletter') afficherNewsletters();
         if(page === 'dashboard') chargerStatsDashboard();
         if(page === 'utilisateur') afficherUtilisateursTickets();
+        if(page === 'campagnes') afficherCampagnes();
       }
 
       function chargerUtilisateursNewsletter() {
@@ -416,6 +585,7 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
       document.getElementById('menu-utilisateur').onclick = function() {
         showPage('utilisateur');
       };
+      document.getElementById('menu-campagnes').onclick = function() { showPage('campagnes'); afficherCampagnes(); };
       document.getElementById('logout-link').onclick = function(e) {
         e.preventDefault();
         auth.signOut().then(function() {

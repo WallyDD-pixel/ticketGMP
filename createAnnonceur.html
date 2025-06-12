@@ -1,285 +1,377 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Créer une campagne annonceur</title>
-  <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%); margin: 0; }
-    .annonceur-container {
-      max-width: 480px; margin: 40px auto; padding: 24px 16px; background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 18px #b3c6e0; min-height: 60vh;
+<!-- Formulaire de création de campagne -->
+<style>
+  body {
+    background: #f5f7fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .logo-gmp {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .logo-gmp img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 8px #b3c6e0);
+    border-radius: 12px;
+    background: #fff;
+    padding: 8px 16px;
+  }
+  .logo-gmp span {
+    font-size: 1.15em;
+    color: #1976d2;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    text-shadow: 0 1px 2px #e3eaf5;
+  }
+  .campagne-container {
+    max-width: 500px;
+    margin: 48px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 36px rgba(25, 118, 210, 0.13), 0 2px 8px rgba(25, 118, 210, 0.10);
+    padding: 40px 36px 32px 36px;
+    border: 2px solid #1976d2;
+    background: linear-gradient(120deg, #f5f7fa 80%, #e3eaf5 100%);
+  }
+  .campagne-container h1 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 32px;
+    font-size: 2.1em;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  #campagne-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 8px;
+  }
+  .form-row {
+    display: flex;
+    gap: 48px; /* Espace augmenté entre les deux inputs */
+    margin-bottom: 0;
+  }
+  .form-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  #campagne-form label {
+    font-weight: 600;
+    color: #1976d2;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  #campagne-form input,
+  #campagne-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 0;
+    border: 1.5px solid #b3c6e0;
+    border-radius: 7px;
+    font-size: 1.08em;
+    background: #f7fafd;
+    transition: border 0.2s;
+    box-sizing: border-box;
+    outline: none;
+  }
+  #campagne-form input:focus, #campagne-form textarea:focus {
+    border: 1.5px solid #1976d2;
+    background: #f0f6ff;
+  }
+  #campagne-form button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.15em;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 24px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+  #campagne-form button:hover {
+    background: linear-gradient(90deg, #1256a3 60%, #1976d2 100%);
+    box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+  }
+  #campagne-form input[type="file"] {
+    background: #f7fafd;
+    border: none;
+    margin-bottom: 18px;
+    font-size: 1em;
+    padding: 0;
+  }
+  #uploadProgress {
+    margin: 10px 0 18px 0;
+    height: 8px;
+    border-radius: 5px;
+    width: 100%;
+    background: #e3eaf5;
+    accent-color: #1976d2;
+  }
+  .success, .error {
+    margin-top: 22px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.08em;
+  }
+  #preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 18px 0 0 0;
+    align-items: flex-start;
+  }
+  #preview img, #preview video {
+    max-width: 120px;
+    max-height: 90px;
+    border-radius: 7px;
+    box-shadow: 0 2px 8px #b3c6e0;
+    object-fit: cover;
+    background: #f7fafd;
+  }
+  #campagne-form select {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 0;
+    border: 1.5px solid #b3c6e0;
+    border-radius: 7px;
+    font-size: 1.08em;
+    background: #f7fafd;
+    color: #1976d2;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%231976d2" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 22px 22px;
+    cursor: pointer;
+  }
+  #campagne-form select:focus {
+    border: 1.5px solid #1976d2;
+    background: #f0f6ff;
+    box-shadow: 0 0 0 2px #1976d233;
+  }
+  #campagne-form option {
+    color: #222;
+    background: #fff;
+    font-size: 1em;
+  }
+  @media (max-width: 700px) {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
     }
-    h1 { color: #1976d2; font-size: 1.5em; margin-bottom: 0.5em; }
-    label { display: block; margin-top: 10px; color: #333; font-weight: 500; font-size:0.98em; }
-    .row-fields { display: flex; gap: 10px; margin-top: 6px; }
-    .row-fields > * { flex: 1; min-width: 0; }
-    .form-group { margin-bottom: 14px; }
-    input, select, textarea {
-      width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #b3c6e0;
-      border-radius: 5px; font-size: 0.98em; background: #f9fbfd;
-      box-sizing: border-box;
-    }
-    textarea { min-height: 70px; resize: vertical; }
-    button {
-      margin-top: 16px; width: 100%; padding: 10px; background: #1976d2; color: #fff;
-      border: none; border-radius: 5px; font-size: 1em; cursor: pointer; transition: background 0.2s;
-    }
-    button:hover { background: #1251a3; }
-    .success { color: #388e3c; margin-top: 10px; font-size:0.97em; }
-    .error { color: #d32f2f; margin-top: 10px; font-size:0.97em; }
-    @media (max-width: 600px) {
-      .annonceur-container { padding: 10px 2vw; }
-      .row-fields { flex-direction: column; gap: 0; }
-      .form-group { margin-bottom: 10px; }
-    }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-  <script src="firebase-config.js"></script>
-</head>
-<body>
-  <div class="annonceur-container">
-    <div style="text-align:center;margin-bottom:18px;">
-      <img src="gmp modif.png" alt="Logo GMP" style="max-width:220px;width:70%;height:auto;filter:drop-shadow(0 2px 8px #b3c6e0);border-radius:10px;">
+  }
+</style>
+<div class="campagne-container">
+  <div class="logo-gmp">
+    <img src="gmp modif.png" alt="Logo GMP">
+    <span>GLOBAL MEDIAS PUB</span>
+  </div>
+  <h1>Créer une campagne</h1>
+  <form id="campagne-form" enctype="multipart/form-data">
+    <div class="form-row">
+      <div class="form-col">
+        <label for="nom">Nom de la campagne :</label>
+        <input type="text" id="nom" name="nom" required>
+      </div>
+      <div class="form-col">
+        <label for="email">Email de contact :</label>
+        <input type="email" id="email" name="email" required>
+      </div>
     </div>
-    <h1>Nouvelle campagne annonceur</h1>
-    <form id="annonceur-form">
-      <div class="form-group">
-        <label for="campagne-nom">Nom de la campagne</label>
-        <input type="text" id="campagne-nom" name="campagne-nom" required />
+    <div class="form-row">
+      <div class="form-col">
+        <label for="debut">Début :</label>
+        <input type="date" id="debut" name="debut" required>
       </div>
-      <div class="row-fields form-group">
-        <div>
-          <label for="date-debut">Début</label>
-          <input type="date" id="date-debut" name="date-debut" required />
-        </div>
-        <div>
-          <label for="date-fin">Fin</label>
-          <input type="date" id="date-fin" name="date-fin" required />
-        </div>
+      <div class="form-col">
+        <label for="fin">Fin :</label>
+        <input type="date" id="fin" name="fin" required>
       </div>
-      <div class="form-group">
-        <label for="style-campagne">Style</label>
-        <input type="text" id="style-campagne" name="style-campagne" placeholder="Ex : Affichage, Digital..." required />
+    </div>
+    <div class="form-row">
+      <div class="form-col">
+        <label for="style">Style de campagne :</label>
+        <input type="text" id="style" name="style" required>
       </div>
-      <div class="form-group">
-        <label for="type-campagne">Type</label>
-        <select id="type-campagne" name="type-campagne" required>
-          <option value="">Type</option>
-          <option value="promotion">Promotion</option>
-          <option value="nouveau produit">Nouveau produit</option>
-          <option value="evenement">Événement</option>
-          <option value="autre">Autre</option>
+      <div class="form-col">
+        <label for="type">Type de campagne :</label>
+        <input type="text" id="type" name="type" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-col">
+        <label for="zone">Zone géographique :</label>
+        <select id="zone" name="zone" required>
+          <option value="">Sélectionner une zone</option>
+          <option value="France">France</option>
+          <option value="Île-de-France">Île-de-France</option>
+          <option value="Paris">Paris</option>
+          <option value="Marseille">Marseille</option>
+          <option value="Lyon">Lyon</option>
+          <option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>
+          <option value="Bordeaux">Bordeaux</option>
+          <option value="Occitanie">Occitanie</option>
+          <option value="Toulouse">Toulouse</option>
+          <option value="Provence-Alpes-Côte d'Azur">Provence-Alpes-Côte d'Azur</option>
+          <option value="Nice">Nice</option>
+          <option value="Hauts-de-France">Hauts-de-France</option>
+          <option value="Lille">Lille</option>
+          <option value="Grand Est">Grand Est</option>
+          <option value="Strasbourg">Strasbourg</option>
+          <option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>
+          <option value="Grenoble">Grenoble</option>
+          <option value="Bretagne">Bretagne</option>
+          <option value="Rennes">Rennes</option>
+          <option value="Normandie">Normandie</option>
+          <option value="Rouen">Rouen</option>
+          <option value="Pays de la Loire">Pays de la Loire</option>
+          <option value="Nantes">Nantes</option>
+          <option value="Centre-Val de Loire">Centre-Val de Loire</option>
+          <option value="Orléans">Orléans</option>
+          <option value="Corse">Corse</option>
+          <option value="Ajaccio">Ajaccio</option>
         </select>
       </div>
-      <div class="form-group" id="type-autre-group" style="display:none;">
-        <label for="type-autre">Précisez le type</label>
-        <input type="text" id="type-autre" name="type-autre" placeholder="Décrivez le type de campagne" />
+    </div>
+    <div class="form-row">
+      <div class="form-col" style="width:100%">
+        <label for="details">Message :</label>
+        <textarea id="details" name="details" rows="4" placeholder="Exprimez-vous librement ici..." required></textarea>
       </div>
-      <div class="row-fields form-group">
-        <div>
-          <label for="zone">Zone</label>
-          <select id="zone" name="zone" required>
-            <option value="">Zone</option>
-            <option value="france">France entière</option>
-            <option value="region">Région</option>
-            <option value="departement">Département</option>
-          </select>
-        </div>
-        <div>
-          <label for="zone-detail">Détail</label>
-          <input type="text" id="zone-detail" name="zone-detail" placeholder="Région ou département" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="campagne-images">Images (plusieurs possibles)</label>
-        <input type="file" id="campagne-images" name="campagne-images" accept="image/*" multiple />
-      </div>
-      <div class="form-group">
-        <label for="campagne-videos">Vidéos (plusieurs possibles)</label>
-        <input type="file" id="campagne-videos" name="campagne-videos" accept="video/*" multiple />
-      </div>
-      <div class="form-group" style="margin-bottom:6px;">
-        <div id="captcha-instruction" style="font-weight:500;margin-bottom:6px;"></div>
-        <div id="captcha-images" style="display:flex;gap:10px;margin-bottom:8px;"></div>
-        <div id="captcha-dropzone" style="border:2px dashed #b3c6e0;border-radius:6px;padding:12px;text-align:center;color:#1976d2;background:#f5faff;min-height:48px;transition:background 0.2s;">Glissez ici l'image demandée</div>
-        <input type="hidden" id="captcha-valid" value="0" />
-      </div>
-      <button type="submit">Envoyer la campagne</button>
-      <div class="success" id="annonceur-success"></div>
-      <div class="error" id="annonceur-error"></div>
-    </form>
-  </div>
-  <script>
+    </div>
+    <label for="media">Images ou vidéos :</label>
+    <input type="file" id="media" name="media" accept="image/*,video/*" multiple required>
+    <div id="preview"></div>
+    <progress id="uploadProgress" value="0" max="100" style="width:100%; display:none;"></progress>
+    <button type="submit">Créer la campagne</button>
+    <div class="success" id="success"></div>
+    <div class="error" id="error"></div>
+  </form>
+</div>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const storage = firebase.storage();
 
-  // Captcha drag & drop d'image
-  const captchaImagesList = [
-    {src: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Golde33443.jpg', label: 'chat'},
-    {src: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Dog_head.jpg', label: 'chien'},
-    {src: 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png', label: 'banane'},
-    {src: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif', label: 'terre'}
-  ];
-  let captchaTarget = null;
-  function genererCaptchaDragDrop() {
-    const idx = Math.floor(Math.random()*captchaImagesList.length);
-    captchaTarget = captchaImagesList[idx];
-    document.getElementById('captcha-instruction').textContent = `Glissez l'image du/de la « ${captchaTarget.label} » dans la zone ci-dessous :`;
-    const shuffled = captchaImagesList.slice().sort(()=>Math.random()-0.5);
-    const imgDiv = document.getElementById('captcha-images');
-    imgDiv.innerHTML = '';
-    shuffled.forEach((img, i) => {
-      const el = document.createElement('img');
-      el.src = img.src;
-      el.alt = img.label;
-      el.setAttribute('data-label', img.label);
-      el.draggable = true;
-      el.style.width = '54px';
-      el.style.height = '54px';
-      el.style.objectFit = 'cover';
-      el.style.borderRadius = '6px';
-      el.style.boxShadow = '0 2px 8px #b3c6e0';
-      el.style.cursor = 'grab';
-      el.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', img.label);
-      });
-      imgDiv.appendChild(el);
-    });
-    const dropzone = document.getElementById('captcha-dropzone');
-    dropzone.style.background = '#f5faff';
-    dropzone.textContent = 'Glissez ici l\'image demandée';
-    document.getElementById('captcha-valid').value = '0';
-  }
-  document.addEventListener('DOMContentLoaded', () => {
-    genererCaptchaDragDrop();
-    const dropzone = document.getElementById('captcha-dropzone');
-    dropzone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropzone.style.background = '#e3f0ff';
-    });
-    dropzone.addEventListener('dragleave', (e) => {
-      dropzone.style.background = '#f5faff';
-    });
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.style.background = '#f5faff';
-      const label = e.dataTransfer.getData('text/plain');
-      if(label === captchaTarget.label) {
-        dropzone.textContent = `✔️ Bravo, bonne image !`;
-        document.getElementById('captcha-valid').value = '1';
-      } else {
-        dropzone.textContent = `❌ Mauvaise image, réessayez.`;
-        document.getElementById('captcha-valid').value = '0';
-      }
-    });
-  });
-
-  // Affichage dynamique du champ "Précisez le type"
-  const typeSelect = document.getElementById('type-campagne');
-  const typeAutreGroup = document.getElementById('type-autre-group');
-  const typeAutreInput = document.getElementById('type-autre');
-  typeSelect.addEventListener('change', function() {
-    if (this.value === 'autre') {
-      typeAutreGroup.style.display = '';
-      typeAutreInput.required = true;
-    } else {
-      typeAutreGroup.style.display = 'none';
-      typeAutreInput.required = false;
-      typeAutreInput.value = '';
-    }
-  });
-
-  document.getElementById('annonceur-form').addEventListener('submit', async function(e) {
+  document.getElementById('campagne-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const nom = document.getElementById('campagne-nom').value.trim();
-    const dateDebut = document.getElementById('date-debut').value;
-    const dateFin = document.getElementById('date-fin').value;
-    const style = document.getElementById('style-campagne').value.trim();
-    let type = document.getElementById('type-campagne').value.trim();
-    let typeAutre = document.getElementById('type-autre').value.trim();
-    const zone = document.getElementById('zone').value;
-    const zoneDetail = document.getElementById('zone-detail').value.trim();
-    const images = document.getElementById('campagne-images').files;
-    const videos = document.getElementById('campagne-videos').files;
-    const successDiv = document.getElementById('annonceur-success');
-    const errorDiv = document.getElementById('annonceur-error');
-    const submitBtn = document.querySelector('#annonceur-form button[type="submit"]');
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const successDiv = document.getElementById('success');
+    const errorDiv = document.getElementById('error');
+    const progressBar = document.getElementById('uploadProgress');
     successDiv.textContent = '';
     errorDiv.textContent = '';
-
-    if (!nom || !dateDebut || !dateFin || !style || !type || !zone) {
-      errorDiv.textContent = "Merci de remplir tous les champs obligatoires.";
-      return;
-    }
-    const captchaValid = document.getElementById('captcha-valid').value === '1';
-    if (!captchaValid) {
-      errorDiv.textContent = "Merci de glisser la bonne image dans la zone de vérification.";
-      genererCaptchaDragDrop();
-      return;
-    }
-    if(type === 'autre') {
-      if(!typeAutre) {
-        errorDiv.textContent = "Merci de préciser le type de campagne.";
-        return;
-      }
-      type = typeAutre;
-    }
     submitBtn.disabled = true;
-    submitBtn.textContent = "Envoi en cours...";
-    let imageUrls = [];
-    let videoUrls = [];
+    submitBtn.textContent = 'Envoi en cours...';
     try {
-      for (let i = 0; i < images.length; i++) {
-        const file = images[i];
-        const ext = file.name.split('.').pop();
-        const storageRef = storage.ref().child(`campagnes/images/${Date.now()}_${i}_${nom.replace(/\s/g, '_')}.${ext}`);
-        await storageRef.put(file);
-        const url = await storageRef.getDownloadURL();
-        imageUrls.push(url);
+      const nom = document.getElementById('nom').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const debut = document.getElementById('debut').value;
+      const fin = document.getElementById('fin').value;
+      const style = document.getElementById('style').value.trim();
+      const type = document.getElementById('type').value.trim();
+      const zone = document.getElementById('zone').value.trim();
+      const details = document.getElementById('details').value.trim();
+      const mediaInput = document.getElementById('media');
+      const files = Array.from(mediaInput.files);
+      if (files.length === 0) throw new Error('Veuillez sélectionner au moins un fichier image ou vidéo.');
+      // Upload media
+      const imageUrls = [];
+      const videoUrls = [];
+      for (const file of files) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const isImage = file.type.startsWith('image/');
+        const isVideo = file.type.startsWith('video/');
+        let folder = '';
+        if (isImage) folder = 'images';
+        else if (isVideo) folder = 'videos';
+        else continue; // skip unsupported
+        const storageRef = storage.ref().child(`campagnes/${folder}/${Date.now()}_${Math.floor(Math.random()*10000)}_${file.name}`);
+        progressBar.style.display = 'block';
+        progressBar.value = 0;
+        await new Promise((resolve, reject) => {
+          const uploadTask = storageRef.put(file);
+          uploadTask.on('state_changed', 
+            (snapshot) => {
+              const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              progressBar.value = percent;
+            }, 
+            (error) => reject(error),
+            async () => {
+              const url = await uploadTask.snapshot.ref.getDownloadURL();
+              if (isImage) imageUrls.push(url);
+              if (isVideo) videoUrls.push(url);
+              resolve();
+            }
+          );
+        });
       }
-      for (let i = 0; i < videos.length; i++) {
-        const file = videos[i];
-        const ext = file.name.split('.').pop();
-        const storageRef = storage.ref().child(`campagnes/videos/${Date.now()}_${i}_${nom.replace(/\s/g, '_')}.${ext}`);
-        await storageRef.put(file);
-        const url = await storageRef.getDownloadURL();
-        videoUrls.push(url);
-      }
+      progressBar.style.display = 'none';
+      // Ajout campagne dans Firestore
+      await db.collection('campagnes').add({
+        nom,
+        email,
+        debut,
+        fin,
+        style,
+        type,
+        zone,
+        details,
+        images: imageUrls,
+        videos: videoUrls,
+        createdAt: new Date()
+      });
+      successDiv.textContent = 'Demande de Campagne créée avec succès !';
+      this.reset();
     } catch (err) {
-      errorDiv.textContent = "Erreur lors de l'upload des fichiers : " + err.message;
+      errorDiv.textContent = 'Erreur : ' + err.message;
+    } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Envoyer la campagne";
-      return;
+      submitBtn.textContent = 'Créer la campagne';
     }
-    db.collection('campagnes').add({
-      nom,
-      dateDebut,
-      dateFin,
-      style,
-      type,
-      zone,
-      zoneDetail,
-      images: imageUrls,
-      videos: videoUrls,
-      createdAt: new Date()
-    })
-    .then(() => {
-      successDiv.textContent = "Campagne envoyée avec succès !";
-      document.getElementById('annonceur-form').reset();
-      genererCaptchaDragDrop();
-    })
-    .catch((err) => {
-      errorDiv.textContent = "Erreur lors de l'envoi de la campagne : " + err.message;
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Envoyer la campagne";
+  });
+
+  const mediaInput = document.getElementById('media');
+  const previewDiv = document.getElementById('preview');
+  mediaInput.addEventListener('change', function() {
+    previewDiv.innerHTML = '';
+    Array.from(mediaInput.files).forEach(file => {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      const url = URL.createObjectURL(file);
+      if (isImage) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = file.name;
+        previewDiv.appendChild(img);
+      } else if (isVideo) {
+        const video = document.createElement('video');
+        video.src = url;
+        video.controls = true;
+        previewDiv.appendChild(video);
+      }
     });
   });
-  </script>
-</body>
-</html>
+</script>

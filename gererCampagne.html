@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gérer une campagne</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- <link href="gererCampagne.css" rel="stylesheet"> -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body class="min-h-screen bg-gray-100">
+  <!-- Barre d'en-tête -->
+  <header class="w-full bg-white shadow flex items-center px-4 py-3 mb-6">
+    <button onclick="window.history.back()" class="flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-200 transition text-blue-700 font-medium">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+      Retour
+    </button>
+    <h1 class="flex-1 text-center text-lg font-bold text-blue-700">Gérer une campagne</h1>
+  </header>
+  <!-- Card principale -->
+  <main class="max-w-3xl mx-auto bg-white rounded-xl shadow p-6 mb-8">
+    <section class="mb-6">
+      <h2 id="campagne-nom" class="text-2xl font-bold text-blue-700 mb-2">Campagne</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-sm text-gray-600 font-semibold">Début :</div>
+          <div class="mb-2" id="campagne-debut"></div>
+          <div class="text-sm text-gray-600 font-semibold">Fin :</div>
+          <div class="mb-2" id="campagne-fin"></div>
+          <div class="text-sm text-gray-600 font-semibold">Zone géographique :</div>
+          <div class="mb-2" id="campagne-zone"></div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-600 font-semibold">Style :</div>
+          <div class="mb-2" id="campagne-style"></div>
+          <div class="text-sm text-gray-600 font-semibold">Type :</div>
+          <div class="mb-2" id="campagne-type"></div>
+          <div class="text-sm text-gray-600 font-semibold">Message :</div>
+          <div class="mb-2" id="campagne-details"></div>
+        </div>
+      </div>
+    </section>
+    <section class="mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+          <h3 class="text-blue-700 font-semibold mb-2 text-center">Images</h3>
+          <div class="flex flex-col gap-2 items-center" id="images-preview"></div>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
+          <h3 class="text-blue-700 font-semibold mb-2 text-center">Vidéos</h3>
+          <div class="flex flex-col gap-2 items-center" id="videos-preview"></div>
+        </div>
+      </div>
+    </section>
+    <section class="mt-8">
+      <h4 class="text-blue-700 font-semibold mb-2">Contacter l'utilisateur</h4>
+      <form id="comm-form" class="mb-2">
+        <label for="comm-message" class="block text-sm font-medium text-blue-700 mb-1">Message :</label>
+        <textarea id="comm-message" class="form-control w-full rounded border-gray-300 mb-2" rows="3" placeholder="Votre message..." required></textarea>
+        <button type="submit" class="w-full bg-blue-700 text-white rounded py-2 font-semibold hover:bg-blue-800 transition">Envoyer</button>
+        <div class="success text-green-700 mt-2 font-semibold text-center text-sm" id="comm-success"></div>
+        <div class="error text-red-700 mt-2 font-semibold text-center text-sm" id="comm-error"></div>
+      </form>
+      <div id="user-email-info" class="mb-2 text-sm text-blue-700"></div>
+      <div class="flex gap-2">
+        <button class="flex-1 bg-yellow-400 text-blue-900 rounded py-2 font-semibold hover:bg-yellow-500 transition" id="edit-btn">Modifier</button>
+        <button class="flex-1 bg-red-600 text-white rounded py-2 font-semibold hover:bg-red-700 transition" id="delete-btn">Supprimer</button>
+      </div>
+      <div class="success text-green-700 mt-2 font-semibold text-center text-sm" id="success"></div>
+      <div class="error text-red-700 mt-2 font-semibold text-center text-sm" id="error"></div>
+    </section>
+  </main>
+  <!-- Modal édition -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="edit-form">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Modifier la campagne</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+          </div>
+          <div class="modal-body">
+            <label class="form-label" for="edit-nom">Nom :</label>
+            <input class="form-control" type="text" id="edit-nom" name="edit-nom" required>
+            <label class="form-label" for="edit-debut">Début :</label>
+            <input class="form-control" type="date" id="edit-debut" name="edit-debut" required>
+            <label class="form-label" for="edit-fin">Fin :</label>
+            <input class="form-control" type="date" id="edit-fin" name="edit-fin" required>
+            <label class="form-label" for="edit-zone">Zone géographique :</label>
+            <input class="form-control" type="text" id="edit-zone" name="edit-zone" required>
+            <label class="form-label" for="edit-style">Style :</label>
+            <input class="form-control" type="text" id="edit-style" name="edit-style" required>
+            <label class="form-label" for="edit-type">Type :</label>
+            <input class="form-control" type="text" id="edit-type" name="edit-type" required>
+            <label class="form-label" for="edit-details">Message :</label>
+            <textarea class="form-control" id="edit-details" name="edit-details" rows="4" required></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const params = new URLSearchParams(window.location.search);
+    const campagneId = params.get('id');
+    const successDiv = document.getElementById('success');
+    const errorDiv = document.getElementById('error');
+    let campagneData = null;
+    function afficherCampagne() {
+      if (!campagneId) {
+        errorDiv.textContent = "Aucune campagne sélectionnée.";
+        return;
+      }
+      db.collection('campagnes').doc(campagneId).get().then(doc => {
+        if (!doc.exists) {
+          errorDiv.textContent = "Campagne introuvable.";
+          return;
+        }
+        campagneData = doc.data();
+        document.getElementById('campagne-nom').textContent = campagneData.nom || '';
+        document.getElementById('campagne-debut').textContent = campagneData.debut || '';
+        document.getElementById('campagne-fin').textContent = campagneData.fin || '';
+        document.getElementById('campagne-zone').textContent = campagneData.zone || '';
+        document.getElementById('campagne-style').textContent = campagneData.style || '';
+        document.getElementById('campagne-type').textContent = campagneData.type || '';
+        document.getElementById('campagne-details').textContent = campagneData.details || '';
+        // Images
+        const imagesDiv = document.getElementById('images-preview');
+        imagesDiv.innerHTML = (campagneData.images||[]).map(url => `
+          <div class="media-item">
+            <a href="${url}" target="_blank"><img src="${url}" alt="Image campagne"></a>
+            <a href="${url}" download
+              class="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-800 transition font-semibold text-sm"
+              title="Télécharger l'image">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" /></svg>
+              Télécharger l'image
+            </a>
+          </div>
+        `).join('');
+        // Vidéos
+        const videosDiv = document.getElementById('videos-preview');
+        videosDiv.innerHTML = (campagneData.videos||[]).map(url => `
+          <div class="media-item">
+            <a href="${url}" target="_blank"><video src="${url}" controls></video></a>
+            <a href="${url}" download
+              class="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-800 transition font-semibold text-sm"
+              title="Télécharger la vidéo">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" /></svg>
+              Télécharger la vidéo
+            </a>
+          </div>
+        `).join('');
+        // Affichage de l'email utilisateur si présent
+        if (campagneData.email) {
+          document.getElementById('user-email-info').innerHTML = `<b>Email utilisateur :</b> <a href='mailto:${campagneData.email}'>${campagneData.email}</a>`;
+        } else {
+          document.getElementById('user-email-info').textContent = 'Email utilisateur non renseigné.';
+        }
+      });
+    }
+    afficherCampagne();
+    // Edition
+    document.getElementById('edit-btn').onclick = function() {
+      if (!campagneData) return;
+      document.getElementById('edit-nom').value = campagneData.nom || '';
+      document.getElementById('edit-debut').value = campagneData.debut || '';
+      document.getElementById('edit-fin').value = campagneData.fin || '';
+      document.getElementById('edit-zone').value = campagneData.zone || '';
+      document.getElementById('edit-style').value = campagneData.style || '';
+      document.getElementById('edit-type').value = campagneData.type || '';
+      document.getElementById('edit-details').value = campagneData.details || '';
+      new bootstrap.Modal(document.getElementById('editModal')).show();
+    };
+    document.getElementById('edit-form').onsubmit = function(e) {
+      e.preventDefault();
+      successDiv.textContent = '';
+      errorDiv.textContent = '';
+      const data = {
+        nom: document.getElementById('edit-nom').value.trim(),
+        debut: document.getElementById('edit-debut').value,
+        fin: document.getElementById('edit-fin').value,
+        zone: document.getElementById('edit-zone').value.trim(),
+        style: document.getElementById('edit-style').value.trim(),
+        type: document.getElementById('edit-type').value.trim(),
+        details: document.getElementById('edit-details').value.trim(),
+      };
+      db.collection('campagnes').doc(campagneId).update(data)
+        .then(() => {
+          successDiv.textContent = "Modifications enregistrées !";
+          bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+          afficherCampagne();
+        })
+        .catch(err => {
+          errorDiv.textContent = "Erreur : " + err.message;
+        });
+    };
+    // Suppression
+    document.getElementById('delete-btn').onclick = function() {
+      if (!confirm('Voulez-vous vraiment supprimer cette campagne ?')) return;
+      db.collection('campagnes').doc(campagneId).delete()
+        .then(() => {
+          successDiv.textContent = "Campagne supprimée.";
+          setTimeout(() => { window.location.href = 'admin.html#campagnes'; }, 1200);
+        })
+        .catch(err => {
+          errorDiv.textContent = "Erreur : " + err.message;
+        });
+    };
+    // Envoi du message à l'utilisateur (simulation par mailto)
+    document.getElementById('comm-form').onsubmit = function(e) {
+      e.preventDefault();
+      const commSuccess = document.getElementById('comm-success');
+      const commError = document.getElementById('comm-error');
+      commSuccess.textContent = '';
+      commError.textContent = '';
+      if (!campagneData || !campagneData.email) {
+        commError.textContent = "Aucun email utilisateur disponible.";
+        return;
+      }
+      const msg = document.getElementById('comm-message').value.trim();
+      if (!msg) {
+        commError.textContent = "Veuillez saisir un message.";
+        return;
+      }
+      // Ouvre le client mail avec le message prérempli
+      window.location.href = `mailto:${campagneData.email}?subject=Communication%20concernant%20votre%20campagne%20publicitaire&body=${encodeURIComponent(msg)}`;
+      commSuccess.textContent = "Cliquez sur Envoyer dans votre client mail pour contacter l'utilisateur.";
+      document.getElementById('comm-message').value = '';
+    };
+  </script>
+</body>
+</html>
