@@ -324,6 +324,24 @@
         </div>
         <div id="page-users" style="display:none">
           <h2>Liste des utilisateurs</h2>
+          <form id="create-user-form" style="max-width:420px;margin-bottom:32px;background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);padding:24px 28px;border-radius:14px;box-shadow:0 4px 18px #b3c6e0;">
+            <h3 style="color:#1976d2;text-align:center;margin-bottom:18px;font-weight:800;letter-spacing:1px;">Créer un utilisateur</h3>
+            <label for="new-user-email" style="font-weight:600;color:#1976d2;">Email</label>
+            <input type="email" id="new-user-email" required placeholder="Email" style="width:100%;padding:12px;margin-bottom:14px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
+            <label for="new-user-password" style="font-weight:600;color:#1976d2;">Mot de passe</label>
+            <div style="position:relative;margin-bottom:14px;">
+              <input type="password" id="new-user-password" required placeholder="Mot de passe (min. 6 caractères)" minlength="6" style="width:100%;padding:12px 38px 12px 12px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
+              <button type="button" onclick="toggleNewUserPassword('new-user-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#1976d2;font-size:1.2em;cursor:pointer;">👁️</button>
+            </div>
+            <label for="confirm-user-password" style="font-weight:600;color:#1976d2;">Confirmer le mot de passe</label>
+            <div style="position:relative;margin-bottom:14px;">
+              <input type="password" id="confirm-user-password" required placeholder="Confirmer le mot de passe" minlength="6" style="width:100%;padding:12px 38px 12px 12px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
+              <button type="button" onclick="toggleNewUserPassword('confirm-user-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#1976d2;font-size:1.2em;cursor:pointer;">👁️</button>
+            </div>
+            <button type="submit" style="width:100%;padding:12px;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:1.13em;box-shadow:0 2px 8px #b3c6e0;transition:background 0.2s;">Créer l'utilisateur</button>
+            <div class="success" id="create-user-success" style="margin-top:14px;"></div>
+            <div class="error" id="create-user-error" style="margin-top:8px;"></div>
+          </form>
           <table id="users-table" style="width:100%;border-collapse:collapse;">
             <thead>
               <tr style="background:#f0f0f0">
@@ -441,6 +459,56 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           });
         });
       }
+      document.getElementById('create-user-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('new-user-email').value.trim();
+  const password = document.getElementById('new-user-password').value;
+  const confirmPassword = document.getElementById('confirm-user-password').value;
+  const successDiv = document.getElementById('create-user-success');
+  const errorDiv = document.getElementById('create-user-error');
+  successDiv.textContent = '';
+  errorDiv.textContent = '';
+
+  if(password !== confirmPassword) {
+    errorDiv.textContent = "Les mots de passe ne correspondent pas.";
+    return;
+  }
+
+  // Sauvegarder l'utilisateur admin courant
+  const currentUser = firebase.auth().currentUser;
+  const currentEmail = currentUser.email;
+  const currentPassword = prompt("Pour créer un compte, veuillez entrer à nouveau votre mot de passe admin :");
+
+  try {
+    // Créer le nouvel utilisateur (cela va déconnecter l'admin)
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
+    const newUser = firebase.auth().currentUser;
+    // Ajouter dans la collection users
+    await firebase.firestore().collection('users').doc(newUser.uid).set({
+      email: email,
+      createdAt: new Date()
+    });
+    successDiv.textContent = "Utilisateur créé avec succès !";
+    document.getElementById('create-user-form').reset();
+
+    // Se reconnecter en admin
+    await firebase.auth().signOut();
+    await firebase.auth().signInWithEmailAndPassword(currentEmail, currentPassword);
+
+    // Rafraîchir la liste
+    if (typeof afficherUtilisateurs === 'function') afficherUtilisateurs();
+  } catch (err) {
+    if (err.code === 'auth/email-already-in-use') {
+      errorDiv.textContent = "Erreur : cet email est déjà utilisé par un autre compte.";
+    } else {
+      errorDiv.textContent = "Erreur : " + err.message;
+    }
+    // Essayer de reconnecter l'admin en cas d'erreur
+    try {
+      await firebase.auth().signInWithEmailAndPassword(currentEmail, currentPassword);
+    } catch {}
+  }
+});
 
       function afficherUtilisateursTickets() {
         db.collection('utilisateur').orderBy('updatedAt', 'desc').get().then((querySnapshot) => {
@@ -599,6 +667,7 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           showPage('dashboard');
           chargerStatsDashboard();
         } else {
+          // Redirige vers la page de connexion si non connecté
           window.location.href = "index.html";
         }
       });
