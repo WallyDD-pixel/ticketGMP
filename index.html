@@ -102,15 +102,26 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
           document.getElementById('error').style.color = 'green';
           document.getElementById('error').textContent = "Connexion réussie !";
+          // Récupérer le rôle depuis Firestore
+          const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+          let role = 'user';
+          if (userDoc.exists && userDoc.data().role) {
+            role = userDoc.data().role;
+          }
+          // Mettre à jour la date de connexion
           db.collection('users').doc(userCredential.user.uid).set({
             email: userCredential.user.email,
             lastLogin: new Date()
           }, { merge: true });
           setTimeout(function() {
-            window.location.href = "admin.html";
+            if (role === 'admin') {
+              window.location.href = "admin.html";
+            } else {
+              window.location.href = "user-panel.html";
+            }
           }, 1000);
         })
         .catch(error => {

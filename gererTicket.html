@@ -27,6 +27,39 @@
     .reponses { margin-top: 32px; }
     .reponse-item { background: #e3f0ff; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
     .reponse-meta { color: #1976d2; font-size: 0.95em; margin-bottom: 4px; }
+    .admin-msg { background: #1976d2 !important; color: #fff !important; }
+    .admin-msg * { color: #fff !important; }
+    .user-msg { background: #e3f0ff; color: #222; }
+    /* Styles pour le modal d'image */
+    #image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      align-items: center;
+      justify-content: center;
+    }
+    #close-modal {
+      position: absolute;
+      top: 24px;
+      right: 36px;
+      font-size: 2.5em;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #modal-img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 4px 32px #000;
+      display: block;
+      margin: auto;
+    }
   </style>
   <!-- Firebase App (core SDK) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -34,6 +67,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <!-- Firebase Firestore SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
 </head>
 <body>
@@ -44,13 +78,20 @@
     <form id="reponse-form">
       <label for="reponse">Répondre au ticket</label>
       <textarea id="reponse" name="reponse" placeholder="Votre réponse..." required></textarea>
+      <label for="reponse-media">Image ou vidéo (optionnel)</label>
+      <input type="file" id="reponse-media" accept="image/*,video/*" />
       <button type="submit">Envoyer la réponse</button>
       <div class="success" id="success"></div>
       <div class="error" id="error"></div>
     </form>
-    <div class="reponses">
+    <div class="reponses" style="max-height:350px;overflow-y:auto;">
       <h2>Réponses précédentes</h2>
       <div id="reponses-list"></div>
+    </div>
+    <!-- Modal image -->
+    <div id="image-modal" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
+      <span id="close-modal" style="position:absolute;top:24px;right:36px;font-size:2.5em;color:#fff;cursor:pointer;font-weight:bold;">&times;</span>
+      <img id="modal-img" src="" alt="Image" style="max-width:90vw;max-height:85vh;border-radius:12px;box-shadow:0 4px 32px #000;display:block;margin:auto;" />
     </div>
   </div>
   <script>
@@ -58,6 +99,7 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    let ticketAuteurEmail = '';
     // Récupérer l'id du ticket depuis l'URL
     const urlParams = new URLSearchParams(window.location.search);
     const ticketId = urlParams.get('id');
@@ -70,6 +112,7 @@
           return;
         }
         const data = doc.data();
+        ticketAuteurEmail = data.userEmail || '';
         document.getElementById('ticket-info').innerHTML = `
           <b>Entreprise :</b> ${data.company || ''}<br>
           <b>Titre :</b> ${data.title || ''}<br>
@@ -88,34 +131,101 @@
         list.innerHTML = '';
         querySnapshot.forEach(doc => {
           const data = doc.data();
-          const div = document.createElement('div');
-          div.className = 'reponse-item';
-          div.innerHTML = `<div class='reponse-meta'>${data.userEmail || ''} - ${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</div><div>${data.texte || ''}</div>`;
-          list.appendChild(div);
+          let isAdmin = false;
+          if (data.isAdmin) isAdmin = true;
+          const classe = isAdmin ? 'reponse-item admin-msg' : 'reponse-item user-msg';
+          const exp = isAdmin ? '<b>Admin</b>' : '<b>Utilisateur</b>';
+          const couleur = isAdmin ? '#fff' : '#222';
+          const fond = isAdmin ? '#1976d2' : '#e3f0ff';
+          let mediaHtml = '';
+          if (data.imageUrl) {
+            mediaHtml += `<div style='margin-top:8px;'><img src='${data.imageUrl}' alt='Image' class='chat-img-clickable' style='max-width:180px;max-height:180px;border-radius:8px;box-shadow:0 2px 8px #b3c6e0;cursor:pointer;'></div>`;
+          }
+          if (data.videoUrl) {
+            mediaHtml += `<div style='margin-top:8px;'><video src='${data.videoUrl}' controls style='max-width:220px;max-height:180px;border-radius:8px;box-shadow:0 2px 8px #b3c6e0;'></video></div>`;
+          }
+          list.innerHTML += `<div class='${classe}' style='background:${fond};color:${couleur};'><div class='reponse-meta'>${exp} - ${data.userEmail || ''} - ${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</div><div>${data.texte || ''}</div>${mediaHtml}</div>`;
         });
+        // Scroll en bas automatiquement après affichage
+        const reponsesDiv = document.querySelector('.reponses');
+        if (reponsesDiv) {
+          reponsesDiv.scrollTop = reponsesDiv.scrollHeight;
+        }
       });
     }
 
     afficherTicket();
     afficherReponses();
 
+    // Affichage/masquage du formulaire selon le rôle
+    auth.onAuthStateChanged(async function(user) {
+      if (!user) {
+        document.getElementById('reponse-form').style.display = 'none';
+        return;
+      }
+      // Vérification du rôle admin via Firestore
+      let isAdmin = false;
+      try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists && userDoc.data().role === 'admin') {
+          isAdmin = true;
+        }
+      } catch {}
+      // On attend que ticketAuteurEmail soit chargé
+      setTimeout(() => {
+        if (user.email === ticketAuteurEmail || isAdmin) {
+          document.getElementById('reponse-form').style.display = '';
+        } else {
+          document.getElementById('reponse-form').style.display = 'none';
+        }
+      }, 500);
+    });
+
     document.getElementById('reponse-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const reponse = document.getElementById('reponse').value.trim();
+      const mediaFile = document.getElementById('reponse-media').files[0];
       const successDiv = document.getElementById('success');
       const errorDiv = document.getElementById('error');
       successDiv.textContent = '';
       errorDiv.textContent = '';
-      auth.onAuthStateChanged(function(user) {
+      auth.onAuthStateChanged(async function(user) {
         if (!user) {
           errorDiv.textContent = "Vous devez être connecté pour répondre.";
           return;
+        }
+        let isAdmin = false;
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (userDoc.exists && userDoc.data().role === 'admin') {
+            isAdmin = true;
+          }
+        } catch {}
+        let imageUrl = '';
+        let videoUrl = '';
+        if (mediaFile) {
+          try {
+            const ext = mediaFile.name.split('.').pop().toLowerCase();
+            const isImage = mediaFile.type.startsWith('image/');
+            const isVideo = mediaFile.type.startsWith('video/');
+            const storageRef = firebase.storage().ref().child(`reponses/${Date.now()}_${user.uid}.${ext}`);
+            await storageRef.put(mediaFile);
+            const url = await storageRef.getDownloadURL();
+            if (isImage) imageUrl = url;
+            if (isVideo) videoUrl = url;
+          } catch (err) {
+            errorDiv.textContent = "Erreur lors de l'upload du fichier : " + err.message;
+            return;
+          }
         }
         db.collection('tickets').doc(ticketId).collection('reponses').add({
           texte: reponse,
           createdAt: new Date(),
           userId: user.uid,
-          userEmail: user.email
+          userEmail: user.email,
+          isAdmin: isAdmin,
+          imageUrl: imageUrl,
+          videoUrl: videoUrl
         })
         .then(() => {
           successDiv.textContent = "Réponse envoyée !";
@@ -126,6 +236,18 @@
           errorDiv.textContent = "Erreur lors de l'envoi : " + err.message;
         });
       });
+    });
+
+    // Gestion du modal image
+    document.addEventListener('click', function(e) {
+      if (e.target.classList && e.target.classList.contains('chat-img-clickable')) {
+        document.getElementById('modal-img').src = e.target.src;
+        document.getElementById('image-modal').style.display = 'flex';
+      }
+      if (e.target.id === 'close-modal' || e.target.id === 'image-modal') {
+        document.getElementById('image-modal').style.display = 'none';
+        document.getElementById('modal-img').src = '';
+      }
     });
   </script>
 </body>

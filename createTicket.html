@@ -108,18 +108,19 @@
         return;
       }
 
-      const user = auth.currentUser;
-      if (!user) {
-        errorDiv.textContent = "Vous devez être connecté pour soumettre un ticket.";
-        return;
-      }
+      let user = null;
+      try {
+        user = firebase.auth().currentUser;
+      } catch {}
+      // On autorise la soumission même si user est null (admin ou user non connecté)
       submitBtn.disabled = true;
       submitBtn.textContent = "Envoi en cours...";
       let mediaUrl = '';
       if (mediaFile) {
         try {
           const ext = mediaFile.name.split('.').pop();
-          const storageRef = storage.ref().child(`tickets/${Date.now()}_${user.uid}.${ext}`);
+          const uid = user ? user.uid : 'anonymous';
+          const storageRef = storage.ref().child(`tickets/${Date.now()}_${uid}.${ext}`);
           await storageRef.put(mediaFile);
           mediaUrl = await storageRef.getDownloadURL();
         } catch (err) {
@@ -138,8 +139,8 @@
         description,
         priority,
         createdAt: new Date(),
-        userId: user.uid,
-        userEmail: user.email,
+        userId: user ? user.uid : '',
+        userEmail: user ? user.email : email,
         mediaUrl: mediaUrl || ''
       })
       .then(() => {

@@ -442,6 +442,18 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
         </div>
       </div>
     </div>
+    <div id="notification-bell" style="position:fixed;top:24px;right:36px;z-index:10000;cursor:pointer;">
+    <span style="position:relative;display:inline-block;">
+      <svg id="bell-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="#1976d2" style="filter:drop-shadow(0 2px 8px #b3c6e0);">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+      <span id="notif-badge" style="display:none;position:absolute;top:2px;right:2px;background:#d32f2f;color:#fff;font-size:0.95em;font-weight:bold;border-radius:50%;padding:2px 7px;min-width:18px;text-align:center;">0</span>
+    </span>
+  </div>
+  <div id="notif-list" style="display:none;position:fixed;top:64px;right:36px;z-index:10001;background:#fff;border-radius:12px;box-shadow:0 4px 24px #b3c6e0;width:340px;max-height:60vh;overflow-y:auto;padding:0 0 8px 0;">
+    <div style="padding:14px 18px;font-weight:bold;color:#1976d2;border-bottom:1px solid #e3eaf7;">Notifications</div>
+    <ul id="notif-ul" style="list-style:none;padding:0;margin:0;"></ul>
+  </div>
     <script>
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
@@ -764,6 +776,65 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           document.getElementById('export-success').textContent = "Export CSV généré !";
         });
       };
+// --- NOTIFICATIONS ---
+let notifCount = 0;
+let notifList = [];
+const notifBell = document.getElementById('notification-bell');
+const notifBadge = document.getElementById('notif-badge');
+const notifListDiv = document.getElementById('notif-list');
+const notifUl = document.getElementById('notif-ul');
+
+// Afficher/masquer la liste au clic sur la cloche
+notifBell.onclick = function() {
+  notifListDiv.style.display = notifListDiv.style.display === 'none' ? 'block' : 'none';
+  // Marquer toutes les notifications comme vues
+  notifList.forEach(n => n.seen = true);
+  notifCount = notifList.filter(n => !n.seen).length;
+  if (notifCount > 0) {
+    notifBadge.textContent = notifCount;
+    notifBadge.style.display = 'inline-block';
+  } else {
+    notifBadge.style.display = 'none';
+  }
+  renderNotifList();
+};
+
+// Écoute en temps réel des nouveaux tickets
+// (tu peux adapter pour écouter aussi les nouveaux messages dans les sous-collections 'reponses')
+db.collection('tickets').orderBy('createdAt', 'desc').limit(10)
+  .onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'added') {
+        const d = change.doc.data();
+        const titre = d.title || 'Nouveau ticket';
+        const date = d.createdAt ? (d.createdAt.seconds ? new Date(d.createdAt.seconds*1000).toLocaleString() : new Date(d.createdAt).toLocaleString()) : '';
+        notifList.unshift({
+          type: 'ticket',
+          text: `Nouveau ticket : <b>${titre}</b>`,
+          date: date,
+          ticketId: change.doc.id,
+          seen: false
+        });
+        notifCount++;
+        notifBadge.textContent = notifCount;
+        notifBadge.style.display = 'inline-block';
+        renderNotifList();
+      }
+    });
+  });
+
+function renderNotifList() {
+  notifUl.innerHTML = '';
+  notifList.slice(0, 10).forEach(n => {
+    let bg = n.seen ? '#fff' : '#e3f0ff';
+    let color = n.seen ? '#1976d2' : '#d32f2f';
+    if(n.type === 'ticket' && n.ticketId) {
+      notifUl.innerHTML += `<li style='padding:12px 18px;border-bottom:1px solid #e3eaf7;font-size:1.05em;cursor:pointer;background:${bg};color:${color};font-weight:${n.seen ? 'normal' : 'bold'};' onclick="window.location.href='gererTicket.html?id=${n.ticketId}'"><span>${n.text}</span><br><span style='color:#888;font-size:0.95em;'>${n.date}</span></li>`;
+    } else {
+      notifUl.innerHTML += `<li style='padding:12px 18px;border-bottom:1px solid #e3eaf7;font-size:1.05em;background:${bg};color:${color};font-weight:${n.seen ? 'normal' : 'bold'};'><span>${n.text}</span><br><span style='color:#888;font-size:0.95em;'>${n.date}</span></li>`;
+    }
+  });
+}
     </script>
     <!-- Ajout de la bibliothèque PapaParse pour la conversion en CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
