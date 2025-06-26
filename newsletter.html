@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Newsletters - GMP</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --main-color: #1976d2;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container-newsletter {
+      max-width: 800px;
+      margin: 48px auto;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 40px #b3c6e0, 0 2px 8px #b3c6e0;
+      padding: 48px 32px 32px 32px;
+    }
+    h1, h2 {
+      color: #1976d2;
+      text-align: center;
+      font-weight: 800;
+    }
+    .success { color: #388e3c; margin-top: 18px; font-weight: 700; text-align: center; font-size: 1.13em; }
+    .error { color: #d32f2f; margin-top: 18px; font-weight: 700; text-align: center; font-size: 1.13em; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container-newsletter">
+    <h1>Gestion des newsletters</h1>
+    <a href="admin.html" style="float:right;font-size:1.1em;">&larr; Retour Admin</a>
+    <h2>Créer une newsletter</h2>
+    <form id="newsletter-form" style="max-width:600px;margin-bottom:24px;">
+      <label for="newsletter-title">Titre</label>
+      <input type="text" id="newsletter-title" name="newsletter-title" required style="width:100%;padding:12px;margin-bottom:16px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.1em;">
+      <label for="newsletter-image">Image (URL ou upload)</label>
+      <div style="margin-bottom:16px;">
+        <input type="url" id="newsletter-image-url" placeholder="Coller l'URL d'une image" style="width:100%;padding:10px;border-radius:6px;border:1px solid #b3c6e0;font-size:1em;margin-bottom:8px;">
+        <input type="file" id="newsletter-image-file" accept="image/*" style="width:100%;margin-bottom:8px;">
+        <img id="newsletter-image-preview" src="" alt="Aperçu" style="display:none;max-width:100%;max-height:160px;border-radius:8px;box-shadow:0 2px 8px #b3c6e0;margin-top:8px;">
+      </div>
+      <label for="newsletter-content">Contenu</label>
+      <div style="margin-bottom:12px;">
+        <textarea id="newsletter-content" name="newsletter-content" required style="width:100%;min-height:160px;padding:12px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.05em;" placeholder="Vous pouvez insérer du HTML, des images, etc.\nExemple : &lt;img src='https://...' width='200'&gt;"></textarea>
+      </div>
+      <label for="newsletter-users">Destinataires</label>
+      <select id="newsletter-users" name="newsletter-users" multiple style="width:100%;min-height:80px;padding:10px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.05em;margin-bottom:12px;"></select>
+      <small style="color:#888;">Maintenez Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs utilisateurs</small>
+      <button type="submit" style="margin-top:18px;padding:12px 0;width:100%;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;font-size:1.1em;border:none;border-radius:6px;box-shadow:0 2px 8px #b3c6e0;cursor:pointer;">Créer la newsletter</button>
+      <div class="success" id="newsletter-success"></div>
+      <div class="error" id="newsletter-error"></div>
+    </form>
+    <h2>Historique des newsletters</h2>
+    <ul id="newsletter-list"></ul>
+  </div>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    // Auth check
+    auth.onAuthStateChanged(function(user) {
+      if (!user) window.location.href = "index.html";
+    });
+    // Formulaire newsletter
+    function afficherNewsletters() {
+      db.collection('newsletters').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+        const list = document.getElementById('newsletter-list');
+        list.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const li = document.createElement('li');
+          li.innerHTML = `<b>${data.title || ''}</b> <span style='color:#888;font-size:0.95em;'>(${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''})</span><br><div style='margin:6px 0 12px 0;'>${data.content || ''}</div><div style='color:#1976d2;font-size:0.98em;margin-bottom:8px;'><b>Destinataires :</b> ${(data.recipients || []).join(', ')}</div>`;
+          list.appendChild(li);
+        });
+      });
+    }
+    document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const title = document.getElementById('newsletter-title').value.trim();
+      const content = document.getElementById('newsletter-content').value.trim();
+      const usersSelect = document.getElementById('newsletter-users');
+      const selectedUsers = Array.from(usersSelect.selectedOptions).map(opt => opt.value);
+      const successDiv = document.getElementById('newsletter-success');
+      const errorDiv = document.getElementById('newsletter-error');
+      successDiv.textContent = '';
+      errorDiv.textContent = '';
+      if (!title || !content || selectedUsers.length === 0) {
+        errorDiv.textContent = "Veuillez remplir tous les champs et sélectionner au moins un destinataire.";
+        return;
+      }
+      let finalContent = content;
+      if (newsletterImageUrl) {
+        finalContent = `<img src="${newsletterImageUrl}" style="max-width:100%;border-radius:8px;margin-bottom:12px;"><br>` + content;
+      }
+      db.collection('newsletters').add({
+        title,
+        content: finalContent,
+        image: newsletterImageUrl,
+        recipients: selectedUsers,
+        createdAt: new Date()
+      })
+      .then(() => {
+        successDiv.textContent = "Newsletter créée avec succès !";
+        document.getElementById('newsletter-form').reset();
+        imagePreview.style.display = 'none';
+        newsletterImageUrl = "";
+        afficherNewsletters();
+      })
+      .catch((err) => {
+        if (err.code === "permission-denied" || err.message.includes("Missing or insufficient permissions")) {
+          errorDiv.textContent = "Erreur : vous n'avez pas les droits pour créer une newsletter. Contactez l'administrateur.";
+        } else {
+          errorDiv.textContent = "Erreur lors de la création : " + err.message;
+        }
+      });
+    });
+    // Image newsletter
+    const imageUrlInput = document.getElementById('newsletter-image-url');
+    const imageFileInput = document.getElementById('newsletter-image-file');
+    const imagePreview = document.getElementById('newsletter-image-preview');
+    let newsletterImageUrl = "";
+    imageUrlInput.addEventListener('input', function() {
+      if (this.value) {
+        imagePreview.src = this.value;
+        imagePreview.style.display = 'block';
+        newsletterImageUrl = this.value;
+      } else {
+        imagePreview.style.display = 'none';
+        newsletterImageUrl = "";
+      }
+    });
+    imageFileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+          newsletterImageUrl = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+      } else {
+        imagePreview.style.display = 'none';
+        newsletterImageUrl = "";
+      }
+    });
+    // Chargement des utilisateurs
+    db.collection('users').get().then((querySnapshot) => {
+      const select = document.getElementById('newsletter-users');
+      select.innerHTML = '';
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const option = document.createElement('option');
+        option.value = data.email;
+        option.textContent = data.email;
+        select.appendChild(option);
+      });
+    });
+    // Affichage initial
+    afficherNewsletters();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

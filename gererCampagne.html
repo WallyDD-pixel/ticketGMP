@@ -54,6 +54,33 @@
         </div>
       </div>
     </section>
+    <section class="mb-6">
+      <h3 class="text-blue-700 font-semibold mb-2 text-center">Informations détaillées</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-sm text-gray-600 font-semibold">NOM distributeur :</div>
+          <div class="mb-2" id="campagne-distributeur"></div>
+          <div class="text-sm text-gray-600 font-semibold">Nom Partenaire :</div>
+          <div class="mb-2" id="campagne-partenaire"></div>
+          <div class="text-sm text-gray-600 font-semibold">Durée :</div>
+          <div class="mb-2" id="campagne-duree"></div>
+          <div class="text-sm text-gray-600 font-semibold">Type de fichier :</div>
+          <div class="mb-2" id="campagne-typeFichier"></div>
+          <div class="text-sm text-gray-600 font-semibold">Locale/National :</div>
+          <div class="mb-2" id="campagne-localNational"></div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-600 font-semibold">Adresse fournisseur :</div>
+          <div class="mb-2" id="campagne-adresse"></div>
+          <div class="text-sm text-gray-600 font-semibold">Contact campagne :</div>
+          <div class="mb-2" id="campagne-contact"></div>
+          <div class="text-sm text-gray-600 font-semibold">Rémunération Local :</div>
+          <div class="mb-2 text-green-700 font-bold" id="campagne-remunerationLocal"></div>
+          <div class="text-sm text-gray-600 font-semibold">Rémunération National :</div>
+          <div class="mb-2 text-blue-700 font-bold" id="campagne-remunerationNational"></div>
+        </div>
+      </div>
+    </section>
     <section class="mt-8">
       <h4 class="text-blue-700 font-semibold mb-2">Contacter l'utilisateur</h4>
       <form id="comm-form" class="mb-2">
@@ -132,6 +159,16 @@
         document.getElementById('campagne-style').textContent = campagneData.style || '';
         document.getElementById('campagne-type').textContent = campagneData.type || '';
         document.getElementById('campagne-details').textContent = campagneData.details || '';
+        // Champs supplémentaires
+        document.getElementById('campagne-distributeur').textContent = campagneData.distributeur || '';
+        document.getElementById('campagne-partenaire').textContent = campagneData.partenaire || '';
+        document.getElementById('campagne-duree').textContent = campagneData.duree || '';
+        document.getElementById('campagne-typeFichier').textContent = campagneData.typeFichier || '';
+        document.getElementById('campagne-localNational').textContent = campagneData.localNational || '';
+        document.getElementById('campagne-adresse').textContent = campagneData.adresse || '';
+        document.getElementById('campagne-contact').textContent = campagneData.contact || '';
+        document.getElementById('campagne-remunerationLocal').textContent = campagneData.remunerationLocal ? campagneData.remunerationLocal + ' €' : '';
+        document.getElementById('campagne-remunerationNational').textContent = campagneData.remunerationNational ? campagneData.remunerationNational + ' €' : '';
         // Images
         const imagesDiv = document.getElementById('images-preview');
         imagesDiv.innerHTML = (campagneData.images||[]).map(url => `

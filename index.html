@@ -107,7 +107,7 @@
           document.getElementById('error').textContent = "Connexion réussie !";
           // Récupérer le rôle depuis Firestore
           const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
-          let role = 'user';
+          let role = '';
           if (userDoc.exists && userDoc.data().role) {
             role = userDoc.data().role;
           }
@@ -117,9 +117,14 @@
             lastLogin: new Date()
           }, { merge: true });
           setTimeout(function() {
-            if (role === 'admin') {
+            if (role.toLowerCase() === 'admin') {
               window.location.href = "admin.html";
+            } else if (role.toLowerCase() === 'campagne') {
+              window.location.href = "campagne.html";
+            } else if (role.toLowerCase() === 'tickets') {
+              window.location.href = "user-panel.html";
             } else {
+              // Par défaut, redirige vers user-panel.html
               window.location.href = "user-panel.html";
             }
           }, 1000);

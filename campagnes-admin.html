@@ -1,0 +1,221 @@
+<!-- Nouvelle page dédiée à la gestion des campagnes pour alléger admin.html -->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestion des campagnes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container-campagnes {
+      max-width: 1200px;
+      margin: 48px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px #b3c6e0, 0 2px 8px #b3c6e0;
+      padding: 48px 36px 36px 36px;
+    }
+    h1 {
+      color: #1976d2;
+      font-size: 2.2em;
+      font-weight: 900;
+      margin-bottom: 18px;
+      letter-spacing: 1.2px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #f9fbfd;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px #e3eaf7;
+      margin-top: 18px;
+    }
+    th, td {
+      border: 1px solid #e3eaf7;
+      padding: 14px 10px;
+      text-align: left;
+      font-size: 1.05em;
+      vertical-align: middle;
+    }
+    th {
+      background: #e3f0ff;
+      color: #1976d2;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    tr:nth-child(even) td {
+      background: #f5faff;
+    }
+    tr:hover td {
+      background: #e3f0ff;
+      transition: background 0.18s;
+    }
+    td img {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px #b3c6e0;
+      transition: transform 0.15s;
+    }
+    td img:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 16px #1976d2aa;
+    }
+    .btn-main {
+      background: linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #b3c6e0;
+      transition: background 0.18s, transform 0.1s;
+      margin: 0 4px;
+      letter-spacing: 0.6px;
+      display: inline-block;
+    }
+    .btn-main:hover {
+      background: linear-gradient(90deg, #1251a3 60%, #1976d2 100%);
+      transform: scale(1.07);
+      color: #fff;
+    }
+    @media (max-width: 1000px) {
+      .container-campagnes { max-width: 99vw; padding: 18px 2vw; }
+      table th, table td { font-size: 0.98em; padding: 8px 4px; }
+    }
+    @media (max-width: 700px) {
+      .container-campagnes { padding: 8px 2vw; }
+      h1 { font-size: 1.3em; }
+      table th, table td { font-size: 0.93em; padding: 5px 2px; }
+      .btn-main { padding: 8px 10px; font-size: 0.95em; }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container-campagnes">
+    <h1>Gestion des campagnes <span id="admin-campagne-count" style="color:#388e3c;font-size:0.95em;font-weight:600;"></span></h1>
+    <div style="margin-bottom:18px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+      <input id="search-campagne" type="text" class="form-control" style="max-width:320px;display:inline-block;" placeholder="Rechercher (nom, partenaire, distributeur)">
+      <span id="campagne-total" style="color:#1976d2;font-weight:600;"></span>
+    </div>
+    <div style="overflow-x:auto;">
+    <table id="campagnes-table">
+      <thead>
+        <tr>
+          <th>NOM distributeur</th>
+          <th>Nom Partenaire</th>
+          <th>Nom de la Campagne</th>
+          <th>Début</th>
+          <th>Durée</th>
+          <th>Style</th>
+          <th>Type</th>
+          <th>Type de fichier</th>
+          <th>Locale/National</th>
+          <th>Adresse fournisseur</th>
+          <th>Contact</th>
+          <th>Rémunération Local</th>
+          <th>Rémunération National</th>
+          <th>Message</th>
+          <th>Images</th>
+          <th>Vidéos</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    </div>
+    <div style="margin-top:32px;text-align:center;">
+      <a href="admin.html" class="btn-main">Retour Admin</a>
+    </div>
+  </div>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    let campagnesData = [];
+    function renderCampagnesTable(data) {
+      const tbody = document.querySelector('#campagnes-table tbody');
+      tbody.innerHTML = '';
+      let count = 0;
+      data.forEach((d) => {
+        count++;
+        const images = (d.images||[]).map(url => `<a href="${url}" target="_blank"><img src="${url}" style="max-width:40px;max-height:40px;border-radius:6px;margin:2px;"></a>`).join('');
+        const videos = (d.videos||[]).map(url => `<a href="${url}" target="_blank">🎬</a>`).join(' ');
+        let badge = '';
+        if (d.localNational) {
+          badge = `<span style="padding:2px 10px;border-radius:8px;font-size:0.98em;font-weight:600;color:#fff;background:${d.localNational==='National'?'#1976d2':'#388e3c'};margin-left:4px;">${d.localNational}</span>`;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.distributeur||''}</td>
+          <td>${d.partenaire||''}</td>
+          <td><a href="gererCampagne.html?id=${d.id}" style="color:#1976d2;font-weight:bold;text-decoration:underline;cursor:pointer;">${d.nom||''}</a></td>
+          <td>${d.debut||''}</td>
+          <td>${d.duree||''}</td>
+          <td>${d.style||''}</td>
+          <td>${d.type||''}</td>
+          <td>${d.typeFichier||''}</td>
+          <td>${badge}</td>
+          <td>${d.adresse||''}</td>
+          <td>${d.contact||''}</td>
+          <td><span style="color:#388e3c;font-weight:700;">${d.remunerationLocal ? d.remunerationLocal + ' €' : ''}</span></td>
+          <td><span style="color:#1976d2;font-weight:700;">${d.remunerationNational ? d.remunerationNational + ' €' : ''}</span></td>
+          <td style="max-width:180px;overflow:auto;">${d.details||''}</td>
+          <td>${images}</td>
+          <td>${videos}</td>
+          <td>
+            <button class="btn-main" onclick="window.location.href='gererCampagne.html?id=${d.id}'">Voir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('admin-campagne-count').textContent = `(${count})`;
+      document.getElementById('campagne-total').textContent = count > 0 ? `${count} campagne${count>1?'s':''} affichée${count>1?'s':''}` : '';
+      if (count === 0) {
+        tbody.innerHTML = `<tr><td colspan="17" style="color:#888;text-align:center;">Aucune campagne trouvée.</td></tr>`;
+      }
+    }
+    function afficherCampagnes() {
+      db.collection('campagnes').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+        campagnesData = [];
+        querySnapshot.forEach((doc) => {
+          const d = doc.data();
+          d.id = doc.id;
+          campagnesData.push(d);
+        });
+        renderCampagnesTable(campagnesData);
+      }).catch((err) => {
+        const tbody = document.querySelector('#campagnes-table tbody');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="17" style="color:#d32f2f;text-align:center;">Erreur lors du chargement des campagnes : ${err.message}</td></tr>`;
+      });
+    }
+    document.getElementById('search-campagne').addEventListener('input', function() {
+      const val = this.value.trim().toLowerCase();
+      if (!val) {
+        renderCampagnesTable(campagnesData);
+        return;
+      }
+      const filtered = campagnesData.filter(d =>
+        (d.nom||'').toLowerCase().includes(val) ||
+        (d.partenaire||'').toLowerCase().includes(val) ||
+        (d.distributeur||'').toLowerCase().includes(val)
+      );
+      renderCampagnesTable(filtered);
+    });
+    window.onload = afficherCampagnes;
+  </script>
+</body>
+</html>

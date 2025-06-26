@@ -287,7 +287,7 @@
           <li><a href="#campagnes" id="menu-campagnes">Campagnes</a></li>
           <li><a href="#utilisateur" id="menu-utilisateur">Utilisateurs (tickets)</a></li>
           <li><a href="#tickets" id="menu-tickets">Tickets</a></li>
-            <li><a href="#newsletter" id="menu-newsletter">Créer une newsletter</a></li>
+            <li><a href="newsletter.html" id="menu-newsletter">Créer une newsletter</a></li>
             <li><a href="createticket.html" id="menu-createticket">Créer un ticket</a></li>
             <li><a href="createAnnonceur.html" id="menu-createannonceur">Créer une campagne</a></li>
           <li><a href="#settings" id="menu-settings">Paramètres</a></li>
@@ -338,6 +338,13 @@
               <input type="password" id="confirm-user-password" required placeholder="Confirmer le mot de passe" minlength="6" style="width:100%;padding:12px 38px 12px 12px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
               <button type="button" onclick="toggleNewUserPassword('confirm-user-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#1976d2;font-size:1.2em;cursor:pointer;">👁️</button>
             </div>
+            <label for="new-user-role" style="font-weight:600;color:#1976d2;">Rôle</label>
+            <select id="new-user-role" required style="width:100%;padding:12px;margin-bottom:14px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;">
+              <option value="">Sélectionner un rôle</option>
+              <option value="Tickets">Tickets</option>
+              <option value="Campagne">Campagne</option>
+              <option value="Admin">Admin</option>
+            </select>
             <button type="submit" style="width:100%;padding:12px;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:1.13em;box-shadow:0 2px 8px #b3c6e0;transition:background 0.2s;">Créer l'utilisateur</button>
             <div class="success" id="create-user-success" style="margin-top:14px;"></div>
             <div class="error" id="create-user-error" style="margin-top:8px;"></div>
@@ -347,6 +354,7 @@
               <tr style="background:#f0f0f0">
                 <th style="border:1px solid #ccc;padding:8px;">Email</th>
                 <th style="border:1px solid #ccc;padding:8px;">Date de création</th>
+                <th style="border:1px solid #ccc;padding:8px;">Rôle</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -401,24 +409,7 @@
           </table>
         </div>
         <div id="page-newsletter" style="display:none">
-          <h2>Créer une newsletter</h2>
-          <form id="newsletter-form" style="max-width:600px;margin-bottom:24px;">
-            <label for="newsletter-title">Titre</label>
-            <input type="text" id="newsletter-title" name="newsletter-title" required style="width:100%;padding:12px;margin-bottom:16px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.1em;">
-            <label for="newsletter-content">Contenu</label>
-            <div style="margin-bottom:12px;">
-              <textarea id="newsletter-content" name="newsletter-content" required style="width:100%;min-height:160px;padding:12px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.05em;" placeholder="Vous pouvez insérer du HTML, des images, etc.
-Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
-            </div>
-            <label for="newsletter-users">Destinataires</label>
-            <select id="newsletter-users" name="newsletter-users" multiple style="width:100%;min-height:80px;padding:10px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.05em;margin-bottom:12px;"></select>
-            <small style="color:#888;">Maintenez Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs utilisateurs</small>
-            <button type="submit" style="margin-top:18px;padding:12px 0;width:100%;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;font-size:1.1em;border:none;border-radius:6px;box-shadow:0 2px 8px #b3c6e0;cursor:pointer;">Créer la newsletter</button>
-            <div class="success" id="newsletter-success"></div>
-            <div class="error" id="newsletter-error"></div>
-          </form>
-          <h2>Historique des newsletters</h2>
-          <ul id="newsletter-list"></ul>
+          <!-- La gestion des newsletters a été déplacée dans newsletter.html -->
         </div>
         <div id="page-campagnes" style="display:none">
           <h2>Gestion des campagnes</h2>
@@ -466,7 +457,7 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           querySnapshot.forEach((doc) => {
             const data = doc.data();
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td style='border:1px solid #ccc;padding:8px;'>${data.email}</td><td style='border:1px solid #ccc;padding:8px;'>${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</td>`;
+            tr.innerHTML = `<td style='border:1px solid #ccc;padding:8px;'>${data.email}</td><td style='border:1px solid #ccc;padding:8px;'>${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</td><td style='border:1px solid #ccc;padding:8px;'>${data.role || ''}</td>`;
             tbody.appendChild(tr);
           });
         });
@@ -476,6 +467,7 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
   const email = document.getElementById('new-user-email').value.trim();
   const password = document.getElementById('new-user-password').value;
   const confirmPassword = document.getElementById('confirm-user-password').value;
+  const role = document.getElementById('new-user-role').value;
   const successDiv = document.getElementById('create-user-success');
   const errorDiv = document.getElementById('create-user-error');
   successDiv.textContent = '';
@@ -483,6 +475,10 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
 
   if(password !== confirmPassword) {
     errorDiv.textContent = "Les mots de passe ne correspondent pas.";
+    return;
+  }
+  if(!role) {
+    errorDiv.textContent = "Veuillez sélectionner un rôle.";
     return;
   }
 
@@ -498,7 +494,8 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
     // Ajouter dans la collection users
     await firebase.firestore().collection('users').doc(newUser.uid).set({
       email: email,
-      createdAt: new Date()
+      createdAt: new Date(),
+      role: role
     });
     successDiv.textContent = "Utilisateur créé avec succès !";
     document.getElementById('create-user-form').reset();
@@ -699,20 +696,64 @@ Exemple : &lt;img src='https://...' width='200'&gt;"></textarea>
           errorDiv.textContent = "Veuillez remplir tous les champs et sélectionner au moins un destinataire.";
           return;
         }
+        // Ajoute l'image dans le contenu si présente
+        let finalContent = content;
+        if (newsletterImageUrl) {
+          finalContent = `<img src="${newsletterImageUrl}" style="max-width:100%;border-radius:8px;margin-bottom:12px;"><br>` + content;
+        }
         db.collection('newsletters').add({
           title,
-          content,
+          content: finalContent,
+          image: newsletterImageUrl,
           recipients: selectedUsers,
           createdAt: new Date()
         })
         .then(() => {
           successDiv.textContent = "Newsletter créée avec succès !";
           document.getElementById('newsletter-form').reset();
+          imagePreview.style.display = 'none';
+          newsletterImageUrl = "";
           afficherNewsletters();
         })
         .catch((err) => {
-          errorDiv.textContent = "Erreur lors de la création : " + err.message;
+          if (err.code === "permission-denied" || err.message.includes("Missing or insufficient permissions")) {
+            errorDiv.textContent = "Erreur : vous n'avez pas les droits pour créer une newsletter. Contactez l'administrateur.";
+          } else {
+            errorDiv.textContent = "Erreur lors de la création : " + err.message;
+          }
         });
+      });
+
+      // Gestion de l'image pour la newsletter
+      const imageUrlInput = document.getElementById('newsletter-image-url');
+      const imageFileInput = document.getElementById('newsletter-image-file');
+      const imagePreview = document.getElementById('newsletter-image-preview');
+      let newsletterImageUrl = "";
+
+      imageUrlInput.addEventListener('input', function() {
+        if (this.value) {
+          imagePreview.src = this.value;
+          imagePreview.style.display = 'block';
+          newsletterImageUrl = this.value;
+        } else {
+          imagePreview.style.display = 'none';
+          newsletterImageUrl = "";
+        }
+      });
+
+      imageFileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+            newsletterImageUrl = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        } else {
+          imagePreview.style.display = 'none';
+          newsletterImageUrl = "";
+        }
       });
 
       // Chargement des utilisateurs dans le sélecteur de destinataires

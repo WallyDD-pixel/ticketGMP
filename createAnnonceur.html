@@ -187,67 +187,72 @@
   <form id="campagne-form" enctype="multipart/form-data">
     <div class="form-row">
       <div class="form-col">
-        <label for="nom">Nom de la campagne :</label>
+        <label for="distributeur">NOM distributeur :</label>
+        <input type="text" id="distributeur" name="distributeur" required>
+      </div>
+      <div class="form-col">
+        <label for="partenaire">Nom Partenaire :</label>
+        <select id="partenaire" name="partenaire" required>
+          <option value="">Sélectionner un partenaire</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-col">
+        <label for="nom">Nom de la Campagne :</label>
         <input type="text" id="nom" name="nom" required>
       </div>
       <div class="form-col">
-        <label for="email">Email de contact :</label>
-        <input type="email" id="email" name="email" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="debut">Début :</label>
+        <label for="debut">Début Campagne :</label>
         <input type="date" id="debut" name="debut" required>
       </div>
-      <div class="form-col">
-        <label for="fin">Fin :</label>
-        <input type="date" id="fin" name="fin" required>
-      </div>
     </div>
     <div class="form-row">
       <div class="form-col">
-        <label for="style">Style de campagne :</label>
+        <label for="duree">Durée de Campagne :</label>
+        <input type="text" id="duree" name="duree" placeholder="Ex: 1 Mois, 2 Semaines" required>
+      </div>
+      <div class="form-col">
+        <label for="style">Style Campagne :</label>
         <input type="text" id="style" name="style" required>
       </div>
+    </div>
+    <div class="form-row">
       <div class="form-col">
         <label for="type">Type de campagne :</label>
         <input type="text" id="type" name="type" required>
       </div>
+      <div class="form-col">
+        <label for="typeFichier">Type de fichier reçu campagne :</label>
+        <input type="text" id="typeFichier" name="typeFichier" placeholder="Ex: image, vidéo, pdf">
+      </div>
     </div>
     <div class="form-row">
       <div class="form-col">
-        <label for="zone">Zone géographique :</label>
-        <select id="zone" name="zone" required>
-          <option value="">Sélectionner une zone</option>
-          <option value="France">France</option>
-          <option value="Île-de-France">Île-de-France</option>
-          <option value="Paris">Paris</option>
-          <option value="Marseille">Marseille</option>
-          <option value="Lyon">Lyon</option>
-          <option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>
-          <option value="Bordeaux">Bordeaux</option>
-          <option value="Occitanie">Occitanie</option>
-          <option value="Toulouse">Toulouse</option>
-          <option value="Provence-Alpes-Côte d'Azur">Provence-Alpes-Côte d'Azur</option>
-          <option value="Nice">Nice</option>
-          <option value="Hauts-de-France">Hauts-de-France</option>
-          <option value="Lille">Lille</option>
-          <option value="Grand Est">Grand Est</option>
-          <option value="Strasbourg">Strasbourg</option>
-          <option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>
-          <option value="Grenoble">Grenoble</option>
-          <option value="Bretagne">Bretagne</option>
-          <option value="Rennes">Rennes</option>
-          <option value="Normandie">Normandie</option>
-          <option value="Rouen">Rouen</option>
-          <option value="Pays de la Loire">Pays de la Loire</option>
-          <option value="Nantes">Nantes</option>
-          <option value="Centre-Val de Loire">Centre-Val de Loire</option>
-          <option value="Orléans">Orléans</option>
-          <option value="Corse">Corse</option>
-          <option value="Ajaccio">Ajaccio</option>
+        <label for="localNational">Campagne Locale ou National :</label>
+        <select id="localNational" name="localNational" required>
+          <option value="">Sélectionner</option>
+          <option value="Local">Local</option>
+          <option value="National">National</option>
         </select>
+      </div>
+      <div class="form-col">
+        <label for="adresse">Adresse fournisseur :</label>
+        <input type="text" id="adresse" name="adresse" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-col">
+        <label for="contact">Contact campagne :</label>
+        <input type="text" id="contact" name="contact" required>
+      </div>
+      <div class="form-col">
+        <label for="remunerationLocal">Rémunération Local (€) :</label>
+        <input type="number" id="remunerationLocal" name="remunerationLocal" min="0" step="0.01" required>
+      </div>
+      <div class="form-col">
+        <label for="remunerationNational">Rémunération National (€) :</label>
+        <input type="number" id="remunerationNational" name="remunerationNational" min="0" step="0.01" required>
       </div>
     </div>
     <div class="form-row">
@@ -286,13 +291,19 @@
     submitBtn.disabled = true;
     submitBtn.textContent = 'Envoi en cours...';
     try {
+      const distributeur = document.getElementById('distributeur').value.trim();
+      const partenaire = document.getElementById('partenaire').value.trim();
       const nom = document.getElementById('nom').value.trim();
-      const email = document.getElementById('email').value.trim();
       const debut = document.getElementById('debut').value;
-      const fin = document.getElementById('fin').value;
+      const duree = document.getElementById('duree').value.trim();
       const style = document.getElementById('style').value.trim();
       const type = document.getElementById('type').value.trim();
-      const zone = document.getElementById('zone').value.trim();
+      const typeFichier = document.getElementById('typeFichier').value.trim();
+      const localNational = document.getElementById('localNational').value;
+      const adresse = document.getElementById('adresse').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const remunerationLocal = document.getElementById('remunerationLocal').value.trim();
+      const remunerationNational = document.getElementById('remunerationNational').value.trim();
       const details = document.getElementById('details').value.trim();
       const mediaInput = document.getElementById('media');
       const files = Array.from(mediaInput.files);
@@ -331,13 +342,19 @@
       progressBar.style.display = 'none';
       // Ajout campagne dans Firestore
       await db.collection('campagnes').add({
+        distributeur,
+        partenaire,
         nom,
-        email,
         debut,
-        fin,
+        duree,
         style,
         type,
-        zone,
+        typeFichier,
+        localNational,
+        adresse,
+        contact,
+        remunerationLocal,
+        remunerationNational,
         details,
         images: imageUrls,
         videos: videoUrls,
@@ -373,5 +390,32 @@
         previewDiv.appendChild(video);
       }
     });
+  });
+
+  window.addEventListener('DOMContentLoaded', function() {
+    db.collection('users').where('role', '==', 'Campagne').get()
+      .then((querySnapshot) => {
+        const select = document.getElementById('partenaire');
+        select.innerHTML = '<option value="">Sélectionner un partenaire</option>';
+        let found = false;
+        querySnapshot.forEach((doc) => {
+          found = true;
+          const data = doc.data();
+          const label = data.email;
+          const option = document.createElement('option');
+          option.value = data.email;
+          option.textContent = label;
+          select.appendChild(option);
+        });
+        if (!found) {
+          const option = document.createElement('option');
+          option.value = "";
+          option.textContent = "Aucun utilisateur 'Campagne' trouvé";
+          select.appendChild(option);
+        }
+      })
+      .catch((err) => {
+        alert("Erreur Firestore : " + err.message);
+      });
   });
 </script>
