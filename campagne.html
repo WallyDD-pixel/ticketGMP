@@ -4,62 +4,75 @@
   <meta charset="UTF-8">
   <title>Dashboard Utilisateur</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="user-panel.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
 </head>
-<body>
-  <div class="user-dashboard">
-    <div class="user-header">
-      <div class="user-avatar" id="user-avatar">👤</div>
-      <div class="user-header-info">
-        <h2 id="user-name">Espace Campagne</h2>
-        <div class="user-email" id="user-email"></div>
-        <div class="user-date" id="user-created"></div>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-6xl mx-auto py-8 px-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <div id="user-avatar" class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-700"></div>
+        <div>
+          <div id="user-email" class="font-semibold text-gray-700"></div>
+          <div id="user-created" class="text-xs text-gray-400"></div>
+        </div>
       </div>
-      <div class="user-actions">
-        <button class="btn-main" id="change-password-btn">Changer mon mot de passe</button>
-        <button class="btn-main btn-logout" id="logout-btn">Se déconnecter</button>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-value" id="stat-campagnes">0</div>
-        <div class="stat-label">Campagnes</div>
+      <div class="flex gap-2">
+        <button id="change-password-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Changer mon mot de passe</button>
+        <button id="logout-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">Se déconnecter</button>
       </div>
     </div>
-    <div class="success" id="user-success"></div>
-    <div class="error" id="user-error"></div>
-    <div class="tickets-section">
-      <h4>Toutes les campagnes</h4>
-      <div id="no-campagnes" style="color:#888;"></div>
-      <table class="tickets-table" id="campagnes-table" style="display:none;">
-        <thead>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded shadow p-6 text-center">
+        <div class="text-3xl font-bold text-blue-700" id="stat-campagnes">0</div>
+        <div class="text-gray-500 mt-1">Campagnes</div>
+      </div>
+    </div>
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full overflow-x-auto" style="max-width:100vw;">
+      <h2 class="text-xl font-bold text-blue-700 min-w-max">Mes campagnes</h2>
+      <div class="flex gap-2">
+        <button id="export-campagnes-csv" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Exporter CSV</button>
+        <input id="search-campagne" class="border border-gray-300 rounded px-3 py-2 w-full sm:w-80 min-w-[250px]" placeholder="Rechercher une campagne...">
+      </div>
+    </div>
+    <div id="no-campagnes" class="text-gray-400 mb-2"></div>
+    <div class="overflow-x-auto">
+      <table id="campagnes-table" class="min-w-full bg-white rounded shadow text-sm" style="display:none;">
+        <thead class="bg-blue-50">
           <tr>
-            <th>Nom</th>
-            <th>Début</th>
-            <th>Fin</th>
-            <th>Zone</th>
-            <th>Style</th>
-            <th>Type</th>
-            <th>Message</th>
-            <th>Images</th>
-            <th>Vidéos</th>
-            <th>Action</th>
+            <th class="px-3 py-2 text-left font-semibold text-blue-700">Nom</th>
+            <th class="px-3 py-2 text-left">Début</th>
+            <th class="px-3 py-2 text-left">Fin</th>
+            <th class="px-3 py-2 text-left">Zone</th>
+            <th class="px-3 py-2 text-left">Style</th>
+            <th class="px-3 py-2 text-left">Type</th>
+            <th class="px-3 py-2 text-left">Locale/National</th>
+            <th class="px-3 py-2 text-left">Partenaire</th>
+            <th class="px-3 py-2 text-left">Distributeur</th>
+            <th class="px-3 py-2 text-left">Durée</th>
+            <th class="px-3 py-2 text-left">Type de fichier</th>
+            <th class="px-3 py-2 text-left">Message</th>
+            <th class="px-3 py-2 text-left">Rémunération Local</th>
+            <th class="px-3 py-2 text-left">Rémunération National</th>
+            <th class="px-3 py-2 text-left">Images</th>
+            <th class="px-3 py-2 text-left">Vidéos</th>
+            <th class="px-3 py-2 text-left">Action</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
+    <div id="user-success" class="text-green-600 mt-4"></div>
+    <div id="user-error" class="text-red-600 mt-2"></div>
   </div>
   <script>
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
+    let campagnes = [];
     auth.onAuthStateChanged(async function(user) {
       if (!user) {
         window.location.href = "index.html";
@@ -77,48 +90,76 @@
         created = new Date(user.metadata.creationTime).toLocaleString();
       }
       document.getElementById('user-created').textContent = 'Inscrit le : ' + created;
-
-      // Affichage de toutes les campagnes
+      // Campagnes filtrées
+      const userEmail = user.email.trim().toLowerCase();
       const campagnesSnap = await db.collection('campagnes').orderBy('createdAt', 'desc').get();
-      const campagnes = [];
+      campagnes = [];
       campagnesSnap.forEach(doc => {
         const c = doc.data();
         c._id = doc.id;
-        campagnes.push(c);
+        const partenaires = (c.partenaire||'').split(/[,;]/).map(e=>e.trim().toLowerCase());
+        if (partenaires.includes(userEmail)) {
+          campagnes.push(c);
+        }
       });
       document.getElementById('stat-campagnes').textContent = campagnes.length;
+      renderCampagnesTable(campagnes);
+    });
+    function renderCampagnesTable(data) {
       const tableCamp = document.getElementById('campagnes-table');
       const tbodyCamp = tableCamp.querySelector('tbody');
       tbodyCamp.innerHTML = '';
-      if (campagnes.length === 0) {
+      if (data.length === 0) {
         document.getElementById('no-campagnes').textContent = 'Aucune campagne trouvée.';
         tableCamp.style.display = 'none';
       } else {
         document.getElementById('no-campagnes').textContent = '';
         tableCamp.style.display = '';
-        campagnes.forEach(c => {
-          const images = (c.images||[]).map(url => `<a href="${url}" target="_blank"><img src="${url}" style="max-width:40px;max-height:40px;border-radius:6px;margin:2px;"></a>`).join('');
-          const videos = (c.videos||[]).map(url => `<a href="${url}" target="_blank">🎬</a>`).join(' ');
+        data.forEach(c => {
+          const images = (c.images||[]).map(url => `<a href="${url}" target="_blank"><img src="${url}" class="inline-block w-10 h-10 object-cover rounded mr-1 mb-1"/></a>`).join('');
+          const videos = (c.videos||[]).map(url => `<a href="${url}" target="_blank" class="text-blue-600">🎬</a>`).join(' ');
+          let badge = '';
+          if (c.localNational) {
+            badge = `<span class="px-2 py-1 rounded text-white text-xs font-semibold ${c.localNational==='National'?'bg-blue-600':'bg-green-600'}">${c.localNational}</span>`;
+          }
           const tr = document.createElement('tr');
+          tr.className = 'hover:bg-blue-50';
           tr.innerHTML = `
-            <td><a href="gererCampagne.html?id=${c._id}" style="color:#1976d2;font-weight:bold;text-decoration:underline;cursor:pointer;">${c.nom||''}</a></td>
-            <td>${c.debut||''}</td>
-            <td>${c.fin||''}</td>
-            <td>${c.zone||''}</td>
-            <td>${c.style||''}</td>
-            <td>${c.type||''}</td>
-            <td style="max-width:180px;overflow:auto;">${c.details||''}</td>
-            <td>${images}</td>
-            <td>${videos}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" onclick="window.location.href='gererCampagne.html?id=${c._id}'">Voir</button>
-            </td>
+            <td class="px-3 py-2"><a href="gererCampagne.html?id=${c._id}" class="text-blue-700 font-bold underline">${c.nom||''}</a></td>
+            <td class="px-3 py-2">${c.debut||''}</td>
+            <td class="px-3 py-2">${c.fin||''}</td>
+            <td class="px-3 py-2">${c.zone||''}</td>
+            <td class="px-3 py-2">${c.style||''}</td>
+            <td class="px-3 py-2">${c.type||''}</td>
+            <td class="px-3 py-2">${badge}</td>
+            <td class="px-3 py-2">${c.partenaire||''}</td>
+            <td class="px-3 py-2">${c.distributeur||''}</td>
+            <td class="px-3 py-2">${c.duree||''}</td>
+            <td class="px-3 py-2">${c.typeFichier||''}</td>
+            <td class="px-3 py-2 max-w-xs truncate">${c.details||''}</td>
+            <td class="px-3 py-2 text-green-700 font-bold">${c.remunerationLocal ? c.remunerationLocal + ' €' : ''}</td>
+            <td class="px-3 py-2 text-blue-700 font-bold">${c.remunerationNational ? c.remunerationNational + ' €' : ''}</td>
+            <td class="px-3 py-2">${images}</td>
+            <td class="px-3 py-2">${videos}</td>
+            <td class="px-3 py-2"><a href="gererCampagne.html?id=${c._id}" class="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Voir</a></td>
           `;
           tbodyCamp.appendChild(tr);
         });
       }
+    }
+    document.getElementById('search-campagne').addEventListener('input', function() {
+      const val = this.value.trim().toLowerCase();
+      if (!val) {
+        renderCampagnesTable(campagnes);
+        return;
+      }
+      const filtered = campagnes.filter(c =>
+        (c.nom||'').toLowerCase().includes(val) ||
+        (c.partenaire||'').toLowerCase().includes(val) ||
+        (c.distributeur||'').toLowerCase().includes(val)
+      );
+      renderCampagnesTable(filtered);
     });
-
     document.getElementById('change-password-btn').onclick = function() {
       const user = auth.currentUser;
       if (!user) return;
@@ -137,6 +178,31 @@
         window.location.href = "index.html";
       });
     };
+    // Fonction d'export CSV pour le tableau des campagnes
+    function exportTableToCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      let csv = [];
+      const rows = table.querySelectorAll('tr');
+      for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll('th, td');
+        for (let j = 0; j < cols.length - 1; j++) { // -1 pour ignorer la colonne Actions
+          let text = cols[j].innerText.replace(/\n/g, ' ').replace(/\s+/g, ' ').replace(/"/g, '""');
+          row.push('"' + text + '"');
+        }
+        csv.push(row.join(','));
+      }
+      const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+      const downloadLink = document.createElement('a');
+      downloadLink.download = filename;
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+    document.getElementById('export-campagnes-csv').addEventListener('click', function() {
+      exportTableToCSV('campagnes-table', 'campagnes.csv');
+    });
   </script>
 </body>
 </html>

@@ -108,9 +108,12 @@
 <body>
   <div class="container-campagnes">
     <h1>Gestion des campagnes <span id="admin-campagne-count" style="color:#388e3c;font-size:0.95em;font-weight:600;"></span></h1>
-    <div style="margin-bottom:18px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
-      <input id="search-campagne" type="text" class="form-control" style="max-width:320px;display:inline-block;" placeholder="Rechercher (nom, partenaire, distributeur)">
-      <span id="campagne-total" style="color:#1976d2;font-weight:600;"></span>
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full overflow-x-auto" style="max-width:100vw;">
+      <h2 class="text-xl font-bold text-blue-700 min-w-max">Campagnes</h2>
+      <div class="flex gap-2">
+        <button id="export-campagnes-csv" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Exporter CSV</button>
+        <input id="search-campagne" class="border border-gray-300 rounded px-3 py-2 w-full sm:w-80 min-w-[250px]" placeholder="Rechercher une campagne...">
+      </div>
     </div>
     <div style="overflow-x:auto;">
     <table id="campagnes-table">
@@ -214,6 +217,31 @@
         (d.distributeur||'').toLowerCase().includes(val)
       );
       renderCampagnesTable(filtered);
+    });
+    // Fonction d'export CSV pour le tableau des campagnes
+    function exportTableToCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      let csv = [];
+      const rows = table.querySelectorAll('tr');
+      for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll('th, td');
+        for (let j = 0; j < cols.length - 1; j++) { // -1 pour ignorer la colonne Actions
+          let text = cols[j].innerText.replace(/\n/g, ' ').replace(/\s+/g, ' ').replace(/"/g, '""');
+          row.push('"' + text + '"');
+        }
+        csv.push(row.join(','));
+      }
+      const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+      const downloadLink = document.createElement('a');
+      downloadLink.download = filename;
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
+    document.getElementById('export-campagnes-csv').addEventListener('click', function() {
+      exportTableToCSV('campagnes-table', 'campagnes.csv');
     });
     window.onload = afficherCampagnes;
   </script>

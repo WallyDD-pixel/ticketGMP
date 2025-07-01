@@ -79,7 +79,41 @@
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           const li = document.createElement('li');
-          li.innerHTML = `<b>${data.title || ''}</b> <span style='color:#888;font-size:0.95em;'>(${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''})</span><br><div style='margin:6px 0 12px 0;'>${data.content || ''}</div><div style='color:#1976d2;font-size:0.98em;margin-bottom:8px;'><b>Destinataires :</b> ${(data.recipients || []).join(', ')}</div>`;
+          
+          // Affichage du statut d'envoi
+          let statusBadge = '';
+          if (data.status === 'sent') {
+            const sentDate = data.sentAt ? (data.sentAt.seconds ? new Date(data.sentAt.seconds * 1000).toLocaleString() : 'Envoyée') : 'Envoyée';
+            statusBadge = `<span style="background:#4caf50;color:white;padding:3px 8px;border-radius:12px;font-size:0.8em;margin-left:8px;">✓ Envoyée le ${sentDate}</span>`;
+          } else {
+            statusBadge = `<span style="background:#ff9800;color:white;padding:3px 8px;border-radius:12px;font-size:0.8em;margin-left:8px;">⏳ En cours d'envoi</span>`;
+          }
+          
+          // Affichage de l'image si présente
+          let imageHtml = '';
+          if (data.image && data.image.trim()) {
+            imageHtml = `<div style="margin:8px 0;"><img src="${data.image}" alt="Image newsletter" style="max-width:200px;max-height:120px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.1);"></div>`;
+          }
+          
+          li.innerHTML = `
+            <div style="border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:16px;background:#fafafa;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <h3 style="margin:0;color:#1976d2;">${data.title || ''}</h3>
+                ${statusBadge}
+              </div>
+              <p style="color:#666;font-size:0.9em;margin:4px 0;">
+                Créée le ${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}
+              </p>
+              ${imageHtml}
+              <div style="margin:12px 0;padding:12px;background:white;border-radius:6px;border-left:4px solid #1976d2;">
+                ${data.content || ''}
+              </div>
+              <div style="color:#1976d2;font-size:0.9em;margin-top:12px;">
+                <strong>📧 Destinataires (${(data.recipients || []).length}) :</strong> 
+                <span style="color:#666;">${(data.recipients || []).join(', ')}</span>
+              </div>
+            </div>
+          `;
           list.appendChild(li);
         });
       });

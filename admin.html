@@ -2,884 +2,726 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Tableau de bord</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --main-color: #1976d2;
-      --main-gradient: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%);
-      --menu-gradient: linear-gradient(180deg, var(--main-color) 60%, #1565c0 100%);
-      --card-gradient: linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);
-      --shadow: 0 4px 32px #b3c6e0;
-      --radius: 18px;
-      --transition: 0.2s;
-    }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(120deg, #e3f0ff 0%, #f5f5f5 100%);
-      margin: 0;
-      min-height: 100vh;
-      letter-spacing: 0.02em;
-    }
-    .admin-layout {
-      display: flex;
-      min-height: 100vh;
-      background: rgba(25, 118, 210, 0.04);
-    }
-    .admin-menu {
-      width: 260px;
-      background: linear-gradient(180deg, #1976d2 60%, #1565c0 100%);
-      color: #fff;
-      min-height: 100vh;
-      box-shadow: 2px 0 24px #b3c6e0;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      padding: 0;
-      border-radius: 0 24px 24px 0;
-      position: relative;
-    }
-    .menu-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 36px 0 20px 0;
-      background: rgba(255,255,255,0.10);
-      border-bottom: 2px solid #1565c0;
-    }
-    .menu-logo img {
-      width: 100px;
-      height: auto;
-      border-radius: 14px;
-      background: #fff;
-      padding: 10px 18px;
-      filter: drop-shadow(0 2px 10px #b3c6e0);
-      margin-bottom: 10px;
-    }
-    .menu-logo span {
-      color: #fff;
-      font-size: 1.15em;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-shadow: 0 1px 2px #1976d2;
-    }
-    .admin-menu ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      flex: 1;
-    }
-    .admin-menu li {
-      border-bottom: 1px solid #1565c0;
-    }
-    .admin-menu a {
-      display: flex;
-      align-items: center;
-      color: #fff;
-      text-decoration: none;
-      padding: 22px 40px;
-      font-size: 1.15em;
-      letter-spacing: 0.7px;
-      transition: background 0.18s, padding-left 0.18s, color 0.18s;
-      position: relative;
-      border-radius: 0 22px 22px 0;
-      font-weight: 600;
-    }
-    .admin-menu a:hover, .admin-menu a.active {
-      background: #1251a3;
-      padding-left: 56px;
-      color: #ffe082;
-      box-shadow: 0 2px 12px #1976d2aa;
-    }
-    .admin-menu a#logout-link {
-      color: #ffbdbd;
-      font-weight: bold;
-      border-top: 1px solid #1251a3;
-      margin-top: auto;
-      background: #183c5a;
-      transition: background 0.18s, color 0.18s;
-    }
-    .admin-menu a#logout-link:hover {
-      background: #c62828;
-      color: #fff;
-    }
-    .admin-container {
-      flex: 1;
-      max-width: 1300px;
-      margin: 48px auto;
-      padding: 64px 56px 44px 56px;
-      background: #fff;
-      border-radius: 28px;
-      box-shadow: 0 8px 40px #b3c6e0, 0 2px 8px #b3c6e0;
-      min-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-      position: relative;
-    }
-    h1 {
-      color: #1976d2;
-      font-size: 2.7em;
-      margin-bottom: 0.2em;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      text-align: center;
-      text-shadow: 0 2px 8px #e3eaf7;
-    }
-    h2 {
-      color: #1976d2;
-      font-size: 1.5em;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      letter-spacing: 0.7px;
-      font-weight: 800;
-    }
-    #user-info {
-      color: #555;
-      font-size: 1.13em;
-      margin-bottom: 18px;
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #f9fbfd;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px #e3eaf7;
-    }
-    th, td {
-      border: 1px solid #e3eaf7;
-      padding: 18px 16px;
-      text-align: left;
-      font-size: 1.08em;
-    }
-    th {
-      background: #e3f0ff;
-      color: #1976d2;
-      font-weight: 800;
-      letter-spacing: 0.7px;
-      text-transform: uppercase;
-    }
-    tr:nth-child(even) td {
-      background: #f5faff;
-    }
-    tr:hover td {
-      background: #e3f0ff;
-      transition: background 0.18s;
-    }
-    .stat-card {
-      background: linear-gradient(120deg, #f8fafc 80%, #e3eaf7 100%);
-      box-shadow: 0 4px 24px #b3c6e0;
-      border-radius: 18px;
-      padding: 36px 48px;
-      min-width: 220px;
-      text-align: center;
-      margin-bottom: 12px;
-      transition: box-shadow 0.18s, transform 0.12s;
-      border: 2px solid #e3eaf7;
-    }
-    .stat-card:hover {
-      box-shadow: 0 8px 32px #1976d2aa;
-      transform: translateY(-4px) scale(1.04);
-    }
-    .stat-card div:first-child {
-      font-size: 2.5em;
-      font-weight: bold;
-      color: #1976d2;
-      margin-bottom: 8px;
-    }
-    .stat-card div:last-child {
-      font-size: 1.18em;
-      color: #333;
-    }
-    .gerer-ticket-btn, .btn-main {
-      background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 14px 34px;
-      font-size: 1.13em;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 8px #b3c6e0;
-      transition: background 0.18s, transform 0.1s;
-      margin: 0 4px;
-      letter-spacing: 0.6px;
-      display: inline-block;
-    }
-    .gerer-ticket-btn:hover, .btn-main:hover {
-      background: linear-gradient(90deg, #1251a3 60%, #1976d2 100%);
-      transform: scale(1.07);
-      color: #fff;
-    }
-    .form-control, .form-select, input[type="text"], input[type="email"], textarea {
-      border-radius: 12px;
-      border: 2px solid #b3c6e0;
-      font-size: 1.08em;
-      background: #f9fbfd;
-      margin-bottom: 16px;
-      padding: 14px 16px;
-      transition: border 0.18s, box-shadow 0.18s;
-    }
-    .form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
-      border: 2px solid #1976d2;
-      background: #f0f6ff;
-      box-shadow: 0 0 0 2px #1976d233;
-      outline: none;
-    }
-    .success {
-      color: #388e3c;
-      margin-top: 18px;
-      font-weight: 700;
-      text-align: center;
-      font-size: 1.13em;
-    }
-    .error {
-      color: #d32f2f;
-      margin-top: 18px;
-      font-weight: 700;
-      text-align: center;
-      font-size: 1.13em;
-    }
-    /* Responsive */
-    @media (max-width: 1300px) {
-      .admin-container { max-width: 99vw; padding: 24px 2vw; }
-      .admin-menu { width: 180px; }
-      .admin-menu a { font-size: 1em; padding: 14px 10px; }
-      .stat-card { padding: 24px 10px; min-width: 120px; }
-    }
-    @media (max-width: 900px) {
-      .admin-layout { flex-direction: column; }
-      .admin-menu { flex-direction: row; width: 100vw; min-height: unset; border-radius: 0 0 24px 24px; }
-      .menu-logo { display: none; }
-      .admin-menu ul { display: flex; flex-direction: row; }
-      .admin-menu li { border-bottom: none; border-right: 1px solid #1565c0; }
-      .admin-menu a { border-radius: 0; padding: 14px 10px; font-size: 0.98em; }
-    }
-    @media (max-width: 700px) {
-      .admin-container { padding: 10px 2vw; }
-      h1 { font-size: 1.3em; }
-      .stat-card { padding: 14px 2px; min-width: 80px; font-size: 0.9em; }
-      th, td { padding: 8px 4px; font-size: 0.95em; }
-    }
-  </style>
-  <!-- Firebase App (core SDK) -->
+  <title>Admin - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <!-- Firebase Auth SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <!-- Firebase Firestore SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <style>
+    @media (min-width: 768px) {
+      #burger-btn { display: none !important; }
+      #sidebar { position: static !important; width: 15rem !important; min-height: 100vh; left: 0 !important; top: 0 !important; z-index: 20; box-shadow: none !important; }
+      #main-content { margin-left: 15rem !important; padding-left: 2rem !important; }
+    }
+    @media (max-width: 767px) {
+      #burger-btn { display: block !important; }
+      #sidebar { position: fixed !important; left: 0; top: 0; width: 80vw !important; max-width: 320px; min-height: 100vh; z-index: 40; background: #1976d2 !important; box-shadow: 2px 0 16px #0002; transition: transform 0.2s; }
+      #main-content { margin-left: 0 !important; padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+      #sidebar.active + #sidebar-overlay { display: block; }
+      #sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.25); z-index: 30; }
+    }
+    .table-responsive {
+      width: 100%;
+      overflow-x: scroll;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100vw;
+      scrollbar-color: #1976d2 #e3eaf5;
+      scrollbar-width: thin;
+    }
+    .table-responsive::-webkit-scrollbar {
+      height: 10px;
+      background: #e3eaf5;
+      display: block;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+      background: #1976d2;
+      border-radius: 6px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+      background: #e3eaf5;
+      border-radius: 6px;
+    }
+    @media (max-width: 900px) {
+      #campagnes-table {
+        min-width: 900px !important;
+      }
+    }
+    @media (max-width: 767px) {
+      #campagnes-table {
+        min-width: 700px !important;
+      }
+    }
+    /* Optionnel : effet visuel pour montrer le scroll */
+    .table-responsive::-webkit-scrollbar {
+      height: 8px;
+      background: #e3eaf5;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+      background: #b3c6e0;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-<body>
-    <div class="admin-layout">
-      <nav class="admin-menu">
-        <div class="menu-logo">
-          <img src="gmp modif.png" alt="Logo GMP">
-          <span>GLOBAL MEDIAS PUB</span>
+<body class="bg-gray-50 min-h-screen">
+    <button id="burger-btn" aria-label="Ouvrir le menu" style="display:none;position:fixed;top:1rem;left:1rem;z-index:100;background:#1976d2;color:#fff;border-radius:8px;padding:0.3em 0.7em;box-shadow:0 2px 8px #b3c6e0;font-size:2rem;">&#9776;</button>
+    <div class="flex min-h-screen">
+      <!-- MENU -->
+      <nav class="bg-blue-700 text-white w-60 min-h-screen flex flex-col px-4 py-6 fixed md:static z-20 transition-all duration-200 md:translate-x-0 -translate-x-full md:block" id="sidebar">
+        <div class="flex flex-col items-center mb-8">
+          <img src="gmp modif.png" alt="Logo GMP" class="w-16 h-16 rounded bg-white shadow p-2 mb-2">
+          <span class="font-bold text-lg tracking-wide">GLOBAL MEDIAS PUB</span>
         </div>
-        <ul>
-          <li><a href="#dashboard" id="menu-dashboard">Tableau de bord</a></li>
-          <li><a href="#users" id="menu-users">Utilisateurs</a></li>
-          <li><a href="#campagnes" id="menu-campagnes">Campagnes</a></li>
-          <li><a href="#utilisateur" id="menu-utilisateur">Utilisateurs (tickets)</a></li>
-          <li><a href="#tickets" id="menu-tickets">Tickets</a></li>
-            <li><a href="newsletter.html" id="menu-newsletter">Créer une newsletter</a></li>
-            <li><a href="createticket.html" id="menu-createticket">Créer un ticket</a></li>
-            <li><a href="createAnnonceur.html" id="menu-createannonceur">Créer une campagne</a></li>
-          <li><a href="#settings" id="menu-settings">Paramètres</a></li>
-          <li><a href="#logout" id="logout-link" style="color:#ffbdbd;">Se déconnecter</a></li>
+        <ul class="flex-1 space-y-2">
+          <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold" id="menu-dashboard">Dashboard</a></li>
+          <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold" id="menu-campagnes">Campagnes</a></li>
+          <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold" id="menu-users">Utilisateurs</a></li>
+          <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold" id="menu-clients">Clients</a></li>
+          <li><a href="#" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold" id="menu-tickets">Tickets</a></li>
+          <li><a href="createTicket.html" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold">Créer un ticket</a></li>
+          <li><a href="newsletter.html" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold">Créer une newsletter</a></li>
+          <li><a href="createAnnonceur.html" class="block px-4 py-2 rounded hover:bg-blue-800 font-semibold">Créer une campagne</a></li>
         </ul>
+        <button id="logout-btn" class="mt-8 px-4 py-2 bg-blue-900 text-white rounded hover:bg-red-600 font-bold">Se déconnecter</button>
       </nav>
-      <div class="admin-container">
-        <div id="page-dashboard">
-          <!-- Logo GMP -->
-          <div style="text-align:center;margin-bottom:18px;">
-            <img src="gmp%20modif.png" alt="Logo GMP" style="max-width:220px;width:70%;height:auto;filter:drop-shadow(0 2px 8px #b3c6e0);">
+      <div id="sidebar-overlay"></div>
+      <div class="flex-1 ml-0 md:ml-60 p-6 transition-all duration-200" id="main-content" style="margin-top:3.5rem;">
+        <!-- CONTENU PRINCIPAL -->
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-blue-700">Admin Dashboard</h1>
+            <div id="admin-email" class="text-gray-500 text-sm"></div>
           </div>
-          <h1>Bienvenue sur la page Admin</h1>
-          <p id="user-info"></p>
-          <!-- Dashboard Statistiques -->
-          <div id="dashboard-stats" style="display:flex;gap:32px;justify-content:center;margin:32px 0 18px 0;flex-wrap:wrap;">
-            <div class="stat-card" style="background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);box-shadow:0 2px 12px #b3c6e0;border-radius:12px;padding:28px 38px;min-width:180px;text-align:center;">
-              <div style="font-size:2.2em;font-weight:bold;color:#1976d2;" id="stat-tickets">0</div>
-              <div style="font-size:1.1em;color:#333;">Tickets</div>
+        </header>
+        <div id="dashboard-section">
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded shadow p-6 text-center">
+              <div class="text-3xl font-bold text-blue-700" id="stat-tickets">0</div>
+              <div class="text-gray-500 mt-1">Tickets</div>
             </div>
-            <div class="stat-card" style="background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);box-shadow:0 2px 12px #b3c6e0;border-radius:12px;padding:28px 38px;min-width:180px;text-align:center;">
-              <div style="font-size:2.2em;font-weight:bold;color:#1976d2;" id="stat-users">0</div>
-              <div style="font-size:1.1em;color:#333;">Utilisateurs</div>
+            <div class="bg-white rounded shadow p-6 text-center">
+              <div class="text-3xl font-bold text-blue-700" id="stat-users">0</div>
+              <div class="text-gray-500 mt-1">Utilisateurs</div>
             </div>
-            <div class="stat-card" style="background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);box-shadow:0 2px 12px #b3c6e0;border-radius:12px;padding:28px 38px;min-width:180px;text-align:center;">
-              <div style="font-size:2.2em;font-weight:bold;color:#1976d2;" id="stat-newsletters">0</div>
-              <div style="font-size:1.1em;color:#333;">Newsletters</div>
+            <div class="bg-white rounded shadow p-6 text-center">
+              <div class="text-3xl font-bold text-blue-700" id="stat-newsletters">0</div>
+              <div class="text-gray-500 mt-1">Newsletters</div>
             </div>
-            <div class="stat-card" style="background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);box-shadow:0 2px 12px #b3c6e0;border-radius:12px;padding:28px 38px;min-width:180px;text-align:center;">
-              <div style="font-size:2.2em;font-weight:bold;color:#1976d2;" id="stat-campagnes">0</div>
-              <div style="font-size:1.1em;color:#333;">Campagnes</div>
+            <div class="bg-white rounded shadow p-6 text-center">
+              <div class="text-3xl font-bold text-blue-700" id="stat-campagnes">0</div>
+              <div class="text-gray-500 mt-1">Campagnes</div>
             </div>
           </div>
-        </div>
-        <div id="page-users" style="display:none">
-          <h2>Liste des utilisateurs</h2>
-          <form id="create-user-form" style="max-width:420px;margin-bottom:32px;background:linear-gradient(120deg,#e3f0ff 60%,#f5f5f5 100%);padding:24px 28px;border-radius:14px;box-shadow:0 4px 18px #b3c6e0;">
-            <h3 style="color:#1976d2;text-align:center;margin-bottom:18px;font-weight:800;letter-spacing:1px;">Créer un utilisateur</h3>
-            <label for="new-user-email" style="font-weight:600;color:#1976d2;">Email</label>
-            <input type="email" id="new-user-email" required placeholder="Email" style="width:100%;padding:12px;margin-bottom:14px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
-            <label for="new-user-password" style="font-weight:600;color:#1976d2;">Mot de passe</label>
-            <div style="position:relative;margin-bottom:14px;">
-              <input type="password" id="new-user-password" required placeholder="Mot de passe (min. 6 caractères)" minlength="6" style="width:100%;padding:12px 38px 12px 12px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
-              <button type="button" onclick="toggleNewUserPassword('new-user-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#1976d2;font-size:1.2em;cursor:pointer;">👁️</button>
+          <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full overflow-x-auto" style="max-width:100vw;">
+            <h2 class="text-xl font-bold text-blue-700 min-w-max">Toutes les campagnes</h2>
+            <div class="flex gap-2">
+              <button id="export-campagnes-csv" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Exporter CSV</button>
+              <input id="search-campagne" class="border border-gray-300 rounded px-3 py-2 w-full sm:w-80 min-w-[250px]" placeholder="Rechercher une campagne...">
             </div>
-            <label for="confirm-user-password" style="font-weight:600;color:#1976d2;">Confirmer le mot de passe</label>
-            <div style="position:relative;margin-bottom:14px;">
-              <input type="password" id="confirm-user-password" required placeholder="Confirmer le mot de passe" minlength="6" style="width:100%;padding:12px 38px 12px 12px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;transition:border 0.2s;">
-              <button type="button" onclick="toggleNewUserPassword('confirm-user-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#1976d2;font-size:1.2em;cursor:pointer;">👁️</button>
-            </div>
-            <label for="new-user-role" style="font-weight:600;color:#1976d2;">Rôle</label>
-            <select id="new-user-role" required style="width:100%;padding:12px;margin-bottom:14px;border-radius:8px;border:1.5px solid #b3c6e0;font-size:1.08em;">
-              <option value="">Sélectionner un rôle</option>
-              <option value="Tickets">Tickets</option>
-              <option value="Campagne">Campagne</option>
-              <option value="Admin">Admin</option>
-            </select>
-            <button type="submit" style="width:100%;padding:12px;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:1.13em;box-shadow:0 2px 8px #b3c6e0;transition:background 0.2s;">Créer l'utilisateur</button>
-            <div class="success" id="create-user-success" style="margin-top:14px;"></div>
-            <div class="error" id="create-user-error" style="margin-top:8px;"></div>
-          </form>
-          <table id="users-table" style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f0f0f0">
-                <th style="border:1px solid #ccc;padding:8px;">Email</th>
-                <th style="border:1px solid #ccc;padding:8px;">Date de création</th>
-                <th style="border:1px solid #ccc;padding:8px;">Rôle</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="page-utilisateur" style="display:none">
-          <h2>Liste des utilisateurs (tickets)</h2>
-          <table id="utilisateur-table" style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f0f0f0">
-                <th style="border:1px solid #ccc;padding:8px;">Nom</th>
-                <th style="border:1px solid #ccc;padding:8px;">Email</th>
-                <th style="border:1px solid #ccc;padding:8px;">Date de mise à jour</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="page-settings" style="display:none">
-          <h2>Paramètres</h2>
-          <div style="max-width:500px;margin:0 auto 24px auto;padding:24px 28px;background:#f9fbfd;border-radius:10px;box-shadow:0 2px 8px #e3eaf7;">
-            <h3 style="color:#1976d2;margin-top:0;">Personnalisation</h3>
-            <label for="settings-app-name" style="font-weight:500;">Nom de l'application</label>
-            <input type="text" id="settings-app-name" style="width:100%;padding:10px;margin-bottom:14px;border-radius:6px;border:1px solid #b3c6e0;font-size:1.05em;">
-            <label for="settings-color" style="font-weight:500;">Couleur principale</label>
-            <input type="color" id="settings-color" value="#1976d2" style="width:60px;height:36px;padding:0;margin-bottom:18px;border:none;">
-            <button id="settings-save-btn" style="margin-top:10px;padding:10px 0;width:100%;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;font-size:1.1em;border:none;border-radius:6px;box-shadow:0 2px 8px #b3c6e0;cursor:pointer;">Enregistrer</button>
-            <div class="success" id="settings-success"></div>
           </div>
-          <div style="max-width:500px;margin:0 auto 24px auto;padding:24px 28px;background:#f9fbfd;border-radius:10px;box-shadow:0 2px 8px #e3eaf7;">
-            <h3 style="color:#1976d2;margin-top:0;">Exportation</h3>
-            <button id="export-tickets-btn" style="padding:10px 0;width:100%;background:linear-gradient(90deg,#1976d2 60%,#42a5f5 100%);color:#fff;font-size:1.1em;border:none;border-radius:6px;box-shadow:0 2px 8px #b3c6e0;cursor:pointer;">Exporter les tickets (CSV)</button>
-            <div class="success" id="export-success"></div>
+          <div id="no-campagnes" class="text-gray-400 mb-2"></div>
+          <div class="table-responsive w-full" style="max-width:100vw;">
+            <table id="campagnes-table" class="min-w-[900px] bg-white rounded shadow text-sm" style="display:none;">
+              <thead class="bg-blue-50">
+                <tr>
+                  <th class="px-3 py-2 text-left font-semibold text-blue-700">Distributeur</th>
+                  <th class="px-3 py-2 text-left">Partenaire</th>
+                  <th class="px-3 py-2 text-left">Nom</th>
+                  <th class="px-3 py-2 text-left">Début</th>
+                  <th class="px-3 py-2 text-left">Fin</th>
+                  <th class="px-3 py-2 text-left">Durée</th>
+                  <th class="px-3 py-2 text-left">Zone</th>
+                  <th class="px-3 py-2 text-left">Style</th>
+                  <th class="px-3 py-2 text-left">Type</th>
+                  <th class="px-3 py-2 text-left">Type de fichier</th>
+                  <th class="px-3 py-2 text-left">Locale/National</th>
+                  <th class="px-3 py-2 text-left">Adresse fournisseur</th>
+                  <th class="px-3 py-2 text-left">Contact</th>
+                  <th class="px-3 py-2 text-left">Rémunération Local</th>
+                  <th class="px-3 py-2 text-left">Rémunération National</th>
+                  <th class="px-3 py-2 text-left">Message</th>
+                  <th class="px-3 py-2 text-left">Images</th>
+                  <th class="px-3 py-2 text-left">Vidéos</th>
+                  <th class="px-3 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
-        </div>
-        <div id="page-tickets" style="display:none">
-          <h2>Liste des tickets d'intervention</h2>
-          <table id="tickets-table">
-            <thead>
-              <tr>
-                <th>Entreprise</th>
-                <th>Titre</th>
-                <th>Message</th>
-                <th>Priorité</th>
-                <th>Créé le</th>
-                <th>Utilisateur</th>
-                <th>État</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="page-newsletter" style="display:none">
-          <!-- La gestion des newsletters a été déplacée dans newsletter.html -->
-        </div>
-        <div id="page-campagnes" style="display:none">
-          <h2>Gestion des campagnes</h2>
-          <table id="campagnes-table" style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f0f0f0">
-                <th style="border:1px solid #ccc;padding:8px;">Nom</th>
-                <th style="border:1px solid #ccc;padding:8px;">Début</th>
-                <th style="border:1px solid #ccc;padding:8px;">Fin</th>
-                <th style="border:1px solid #ccc;padding:8px;">Zone</th>
-                <th style="border:1px solid #ccc;padding:8px;">Style</th>
-                <th style="border:1px solid #ccc;padding:8px;">Type</th>
-                <th style="border:1px solid #ccc;padding:8px;">Message</th>
-                <th style="border:1px solid #ccc;padding:8px;">Images</th>
-                <th style="border:1px solid #ccc;padding:8px;">Vidéos</th>
-                <th style="border:1px solid #ccc;padding:8px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
         </div>
       </div>
     </div>
-    <div id="notification-bell" style="position:fixed;top:24px;right:36px;z-index:10000;cursor:pointer;">
-    <span style="position:relative;display:inline-block;">
-      <svg id="bell-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="#1976d2" style="filter:drop-shadow(0 2px 8px #b3c6e0);">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-      <span id="notif-badge" style="display:none;position:absolute;top:2px;right:2px;background:#d32f2f;color:#fff;font-size:0.95em;font-weight:bold;border-radius:50%;padding:2px 7px;min-width:18px;text-align:center;">0</span>
-    </span>
-  </div>
-  <div id="notif-list" style="display:none;position:fixed;top:64px;right:36px;z-index:10001;background:#fff;border-radius:12px;box-shadow:0 4px 24px #b3c6e0;width:340px;max-height:60vh;overflow-y:auto;padding:0 0 8px 0;">
-    <div style="padding:14px 18px;font-weight:bold;color:#1976d2;border-bottom:1px solid #e3eaf7;">Notifications</div>
-    <ul id="notif-ul" style="list-style:none;padding:0;margin:0;"></ul>
-  </div>
     <script>
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
       const db = firebase.firestore();
-
-      function afficherUtilisateurs() {
-        db.collection('users').get().then((querySnapshot) => {
-          const tbody = document.querySelector('#users-table tbody');
-          tbody.innerHTML = '';
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td style='border:1px solid #ccc;padding:8px;'>${data.email}</td><td style='border:1px solid #ccc;padding:8px;'>${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</td><td style='border:1px solid #ccc;padding:8px;'>${data.role || ''}</td>`;
-            tbody.appendChild(tr);
-          });
-        });
-      }
-      document.getElementById('create-user-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const email = document.getElementById('new-user-email').value.trim();
-  const password = document.getElementById('new-user-password').value;
-  const confirmPassword = document.getElementById('confirm-user-password').value;
-  const role = document.getElementById('new-user-role').value;
-  const successDiv = document.getElementById('create-user-success');
-  const errorDiv = document.getElementById('create-user-error');
-  successDiv.textContent = '';
-  errorDiv.textContent = '';
-
-  if(password !== confirmPassword) {
-    errorDiv.textContent = "Les mots de passe ne correspondent pas.";
-    return;
-  }
-  if(!role) {
-    errorDiv.textContent = "Veuillez sélectionner un rôle.";
-    return;
-  }
-
-  // Sauvegarder l'utilisateur admin courant
-  const currentUser = firebase.auth().currentUser;
-  const currentEmail = currentUser.email;
-  const currentPassword = prompt("Pour créer un compte, veuillez entrer à nouveau votre mot de passe admin :");
-
-  try {
-    // Créer le nouvel utilisateur (cela va déconnecter l'admin)
-    await firebase.auth().createUserWithEmailAndPassword(email, password);
-    const newUser = firebase.auth().currentUser;
-    // Ajouter dans la collection users
-    await firebase.firestore().collection('users').doc(newUser.uid).set({
-      email: email,
-      createdAt: new Date(),
-      role: role
-    });
-    successDiv.textContent = "Utilisateur créé avec succès !";
-    document.getElementById('create-user-form').reset();
-
-    // Se reconnecter en admin
-    await firebase.auth().signOut();
-    await firebase.auth().signInWithEmailAndPassword(currentEmail, currentPassword);
-
-    // Rafraîchir la liste
-    if (typeof afficherUtilisateurs === 'function') afficherUtilisateurs();
-  } catch (err) {
-    if (err.code === 'auth/email-already-in-use') {
-      errorDiv.textContent = "Erreur : cet email est déjà utilisé par un autre compte.";
-    } else {
-      errorDiv.textContent = "Erreur : " + err.message;
-    }
-    // Essayer de reconnecter l'admin en cas d'erreur
-    try {
-      await firebase.auth().signInWithEmailAndPassword(currentEmail, currentPassword);
-    } catch {}
-  }
-});
-
-      function afficherUtilisateursTickets() {
-        db.collection('utilisateur').orderBy('updatedAt', 'desc').get().then((querySnapshot) => {
-          const tbody = document.querySelector('#utilisateur-table tbody');
-          tbody.innerHTML = '';
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td style='border:1px solid #ccc;padding:8px;'>${data.lastname || ''}</td><td style='border:1px solid #ccc;padding:8px;'>${data.email || ''}</td><td style='border:1px solid #ccc;padding:8px;'>${data.updatedAt ? (data.updatedAt.seconds ? new Date(data.updatedAt.seconds * 1000).toLocaleString() : new Date(data.updatedAt).toLocaleString()) : ''}</td>`;
-            tbody.appendChild(tr);
-          });
-        });
-      }
-
-      function afficherTickets() {
-        db.collection('tickets').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
-          const tbody = document.querySelector('#tickets-table tbody');
-          tbody.innerHTML = '';
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${data.company || ''}</td>
-              <td>${data.title || ''}</td>
-              <td>${data.description || ''}</td>
-              <td>${data.priority || ''}</td>
-              <td>${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''}</td>
-              <td>${data.userEmail || ''}</td>
-              <td>${data.etat || 'Nouveau'}</td>
-              <td><button class="gerer-ticket-btn" data-id="${doc.id}">Gérer</button></td>
-            `;
-            tbody.appendChild(tr);
-          });
-          // Ajout des listeners sur les boutons Gérer
-          document.querySelectorAll('.gerer-ticket-btn').forEach(btn => {
-            btn.onclick = function() {
-              const ticketId = this.getAttribute('data-id');
-              window.location.href = `gererTicket.html?id=${ticketId}`;
-            };
-          });
-        });
-      }
-
-      function afficherNewsletters() {
-        db.collection('newsletters').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
-          const list = document.getElementById('newsletter-list');
-          list.innerHTML = '';
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `<b>${data.title || ''}</b> <span style='color:#888;font-size:0.95em;'>(${data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString()) : ''})</span><br><div style='margin:6px 0 12px 0;'>${data.content || ''}</div><div style='color:#1976d2;font-size:0.98em;margin-bottom:8px;'><b>Destinataires :</b> ${(data.recipients || []).join(', ')}</div>`;
-            list.appendChild(li);
-          });
-        });
-      }
-
-      function afficherCampagnes() {
-        db.collection('campagnes').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
-          const tbody = document.querySelector('#campagnes-table tbody');
-          tbody.innerHTML = '';
-          querySnapshot.forEach((doc) => {
-            const d = doc.data();
-            const images = (d.images||[]).map(url => `<a href="${url}" target="_blank"><img src="${url}" style="max-width:40px;max-height:40px;border-radius:6px;margin:2px;"></a>`).join('');
-            const videos = (d.videos||[]).map(url => `<a href="${url}" target="_blank">🎬</a>`).join(' ');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td style='border:1px solid #ccc;padding:8px;'>${d.nom||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${d.debut||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${d.fin||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${d.zone||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${d.style||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${d.type||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;max-width:180px;overflow:auto;'>${d.details||''}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${images}</td>
-              <td style='border:1px solid #ccc;padding:8px;'>${videos}</td>
-              <td style='border:1px solid #ccc;padding:8px;'><button class="btn-main" data-id="${doc.id}" onclick="window.location.href='gererCampagne.html?id=${doc.id}'">Voir</button></td>
-            `;
-            tbody.appendChild(tr);
-          });
-        });
-      }
-
-      // Statistiques dashboard
-      function chargerStatsDashboard() {
-        // Tickets
-        db.collection('tickets').get().then((qs) => {
-          document.getElementById('stat-tickets').textContent = qs.size;
-        });
-        // Utilisateurs
-        db.collection('utilisateur').get().then((qs) => {
-          document.getElementById('stat-users').textContent = qs.size;
-        });
-        // Newsletters
-        db.collection('newsletters').get().then((qs) => {
-          document.getElementById('stat-newsletters').textContent = qs.size;
-        });
-        // Campagnes
-        db.collection('campagnes').get().then((qs) => {
-          document.getElementById('stat-campagnes').textContent = qs.size;
-        });
-      }
-
-      function showPage(page) {
-        document.getElementById('page-dashboard').style.display = page === 'dashboard' ? '' : 'none';
-        document.getElementById('page-users').style.display = page === 'users' ? '' : 'none';
-        document.getElementById('page-tickets').style.display = page === 'tickets' ? '' : 'none';
-        document.getElementById('page-settings').style.display = page === 'settings' ? '' : 'none';
-        document.getElementById('page-newsletter').style.display = page === 'newsletter' ? '' : 'none';
-        document.getElementById('page-utilisateur').style.display = page === 'utilisateur' ? '' : 'none';
-        document.getElementById('page-campagnes').style.display = page === 'campagnes' ? '' : 'none';
-        if(page === 'users') afficherUtilisateurs();
-        if(page === 'tickets') afficherTickets();
-        if(page === 'newsletter') afficherNewsletters();
-        if(page === 'dashboard') chargerStatsDashboard();
-        if(page === 'utilisateur') afficherUtilisateursTickets();
-        if(page === 'campagnes') afficherCampagnes();
-      }
-
-      function chargerUtilisateursNewsletter() {
-        const select = document.getElementById('newsletter-users');
-        if (!select) return;
-        db.collection('users').get().then((querySnapshot) => {
-          select.innerHTML = '';
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const option = document.createElement('option');
-            option.value = data.email;
-            option.textContent = data.email;
-            select.appendChild(option);
-          });
-        });
-      }
-
-      document.getElementById('menu-dashboard').onclick = function() { showPage('dashboard'); };
-      document.getElementById('menu-users').onclick = function() { showPage('users'); };
-      document.getElementById('menu-settings').onclick = function() { showPage('settings'); };
-      document.getElementById('menu-tickets').onclick = function() { showPage('tickets'); };
-      document.getElementById('menu-newsletter').onclick = function() {
-        showPage('newsletter');
-        chargerUtilisateursNewsletter();
-      };
-      document.getElementById('menu-utilisateur').onclick = function() {
-        showPage('utilisateur');
-      };
-      document.getElementById('menu-campagnes').onclick = function() { showPage('campagnes'); afficherCampagnes(); };
-      document.getElementById('logout-link').onclick = function(e) {
-        e.preventDefault();
-        auth.signOut().then(function() {
+      let campagnesData = [];
+      auth.onAuthStateChanged(async function(user) {
+        if (!user) {
           window.location.href = "index.html";
-        });
-      };
-
-      auth.onAuthStateChanged(function(user) {
-        if (user) {
-          document.getElementById('user-info').textContent = `Connecté en tant que : ${user.email}`;
-          showPage('dashboard');
-          chargerStatsDashboard();
-        } else {
-          // Redirige vers la page de connexion si non connecté
-          window.location.href = "index.html";
-        }
-      });
-
-      // Gestion du formulaire de newsletter
-      document.getElementById('newsletter-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const title = document.getElementById('newsletter-title').value.trim();
-        const content = document.getElementById('newsletter-content').value.trim();
-        const usersSelect = document.getElementById('newsletter-users');
-        const selectedUsers = Array.from(usersSelect.selectedOptions).map(opt => opt.value);
-        const successDiv = document.getElementById('newsletter-success');
-        const errorDiv = document.getElementById('newsletter-error');
-        successDiv.textContent = '';
-        errorDiv.textContent = '';
-        if (!title || !content || selectedUsers.length === 0) {
-          errorDiv.textContent = "Veuillez remplir tous les champs et sélectionner au moins un destinataire.";
           return;
         }
-        // Ajoute l'image dans le contenu si présente
-        let finalContent = content;
-        if (newsletterImageUrl) {
-          finalContent = `<img src="${newsletterImageUrl}" style="max-width:100%;border-radius:8px;margin-bottom:12px;"><br>` + content;
+        document.getElementById('admin-email').textContent = user.email;
+        // Stats
+        db.collection('tickets').get().then(qs => document.getElementById('stat-tickets').textContent = qs.size);
+        db.collection('users').get().then(qs => document.getElementById('stat-users').textContent = qs.size);
+        db.collection('newsletters').get().then(qs => document.getElementById('stat-newsletters').textContent = qs.size);
+        db.collection('campagnes').get().then(qs => document.getElementById('stat-campagnes').textContent = qs.size);
+        // Campagnes
+        db.collection('campagnes').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+          campagnesData = [];
+          querySnapshot.forEach((doc) => {
+            const d = doc.data();
+            d.id = doc.id;
+            campagnesData.push(d);
+          });
+          renderCampagnesTable(campagnesData);
+        });
+      });
+      function renderCampagnesTable(data) {
+        const tableCamp = document.getElementById('campagnes-table');
+        const tbodyCamp = tableCamp.querySelector('tbody');
+        tbodyCamp.innerHTML = '';
+        if (data.length === 0) {
+          document.getElementById('no-campagnes').textContent = 'Aucune campagne trouvée.';
+          tableCamp.style.display = 'none';
+        } else {
+          document.getElementById('no-campagnes').textContent = '';
+          tableCamp.style.display = '';
+          data.forEach(d => {
+            const images = (d.images||[]).map(url => `<a href=\"${url}\" target=\"_blank\"><img src=\"${url}\" class=\"inline-block w-10 h-10 object-cover rounded mr-1 mb-1\"/></a>`).join('');
+            const videos = (d.videos||[]).map(url => `<a href=\"${url}\" target=\"_blank\" class=\"text-blue-600\">🎬</a>`).join(' ');
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-blue-50';
+            tr.innerHTML = `
+              <td class=\"px-3 py-2\">${d.distributeur||''}</td>
+              <td class=\"px-3 py-2\">${d.partenaire||''}</td>
+              <td class=\"px-3 py-2\">${d.nom||''}</td>
+              <td class=\"px-3 py-2\">${d.debut||''}</td>
+              <td class=\"px-3 py-2\">${d.fin||''}</td>
+              <td class=\"px-3 py-2\">${d.duree||''}</td>
+              <td class=\"px-3 py-2\">${d.zone||''}</td>
+              <td class=\"px-3 py-2\">${d.style||''}</td>
+              <td class=\"px-3 py-2\">${d.type||''}</td>
+              <td class=\"px-3 py-2\">${d.typeFichier||''}</td>
+              <td class=\"px-3 py-2\">${d.localNational||''}</td>
+              <td class=\"px-3 py-2\">${d.adresse||''}</td>
+              <td class=\"px-3 py-2\">${d.contact||''}</td>
+              <td class=\"px-3 py-2 text-green-700 font-bold\">${d.remunerationLocal ? d.remunerationLocal + ' €' : ''}</td>
+              <td class=\"px-3 py-2 text-blue-700 font-bold\">${d.remunerationNational ? d.remunerationNational + ' €' : ''}</td>
+              <td class=\"px-3 py-2 max-w-xs truncate\">${d.details||''}</td>
+              <td class=\"px-3 py-2\">${images}</td>
+              <td class=\"px-3 py-2\">${videos}</td>
+              <td class=\"px-3 py-2\"><a href=\"gererCampagne.html?id=${d.id}\" class=\"px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700\">Voir</a></td>
+            `;
+            tbodyCamp.appendChild(tr);
+          });
         }
-        db.collection('newsletters').add({
-          title,
-          content: finalContent,
-          image: newsletterImageUrl,
-          recipients: selectedUsers,
-          createdAt: new Date()
-        })
-        .then(() => {
-          successDiv.textContent = "Newsletter créée avec succès !";
-          document.getElementById('newsletter-form').reset();
-          imagePreview.style.display = 'none';
-          newsletterImageUrl = "";
-          afficherNewsletters();
-        })
-        .catch((err) => {
-          if (err.code === "permission-denied" || err.message.includes("Missing or insufficient permissions")) {
-            errorDiv.textContent = "Erreur : vous n'avez pas les droits pour créer une newsletter. Contactez l'administrateur.";
-          } else {
-            errorDiv.textContent = "Erreur lors de la création : " + err.message;
+      }
+      document.getElementById('search-campagne').addEventListener('input', function() {
+        const val = this.value.trim().toLowerCase();
+        if (!val) {
+          renderCampagnesTable(campagnesData);
+          return;
+        }
+        const filtered = campagnesData.filter(d =>
+          (d.nom||'').toLowerCase().includes(val) ||
+          (d.partenaire||'').toLowerCase().includes(val) ||
+          (d.distributeur||'').toLowerCase().includes(val)
+        );
+        renderCampagnesTable(filtered);
+      });
+      document.getElementById('logout-btn').onclick = function() {
+        auth.signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      };
+      // Responsive menu JS
+      const sidebar = document.getElementById('sidebar');
+      const burgerBtn = document.getElementById('burger-btn');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('active');
+        if (sidebarOverlay) sidebarOverlay.style.display = 'block';
+      }
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('active');
+        if (sidebarOverlay) sidebarOverlay.style.display = 'none';
+      }
+      if (burgerBtn) {
+        burgerBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openSidebar();
+        });
+      }
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+      }
+      // Fermer le menu responsive après clic sur un lien du menu
+      const sidebarLinks = sidebar.querySelectorAll('a');
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          if (window.innerWidth < 768) {
+            closeSidebar();
           }
         });
       });
+      // Gestion de l'affichage des sections dashboard/campagnes/utilisateurs/tickets
+      const dashboardSection = document.getElementById('dashboard-section');
+      let campagnesSection = null;
+      let usersSection = null;
+      let ticketsSection = null;
+      let clientsSection = null;
 
-      // Gestion de l'image pour la newsletter
-      const imageUrlInput = document.getElementById('newsletter-image-url');
-      const imageFileInput = document.getElementById('newsletter-image-file');
-      const imagePreview = document.getElementById('newsletter-image-preview');
-      let newsletterImageUrl = "";
-
-      imageUrlInput.addEventListener('input', function() {
-        if (this.value) {
-          imagePreview.src = this.value;
-          imagePreview.style.display = 'block';
-          newsletterImageUrl = this.value;
-        } else {
-          imagePreview.style.display = 'none';
-          newsletterImageUrl = "";
-        }
-      });
-
-      imageFileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            imagePreview.src = e.target.result;
-            imagePreview.style.display = 'block';
-            newsletterImageUrl = e.target.result;
-          };
-          reader.readAsDataURL(this.files[0]);
-        } else {
-          imagePreview.style.display = 'none';
-          newsletterImageUrl = "";
-        }
-      });
-
-      // Chargement des utilisateurs dans le sélecteur de destinataires
-      db.collection('users').get().then((querySnapshot) => {
-        const select = document.getElementById('newsletter-users');
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const option = document.createElement('option');
-          option.value = data.email;
-          option.textContent = data.email;
-          select.appendChild(option);
-        });
-      });
-
-      // Gestion des paramètres
-      document.getElementById('settings-save-btn').onclick = function() {
-        const appName = document.getElementById('settings-app-name').value.trim();
-        const color = document.getElementById('settings-color').value;
-        localStorage.setItem('appName', appName);
-        localStorage.setItem('mainColor', color);
-        document.getElementById('settings-success').textContent = "Paramètres enregistrés (local) !";
-        // Changement dynamique de la couleur principale
-        document.documentElement.style.setProperty('--main-color', color);
-        // Mettre à jour le menu et les boutons
-        document.querySelectorAll('.admin-menu').forEach(el => el.style.background = `linear-gradient(180deg, ${color} 60%, #1565c0 100%)`);
-        document.querySelectorAll('th').forEach(el => el.style.color = color);
-        document.querySelectorAll('.gerer-ticket-btn').forEach(el => el.style.background = `linear-gradient(90deg, ${color} 60%, #42a5f5 100%)`);
-        document.querySelector('h1').style.color = color;
-      };
-      // Appliquer les paramètres au chargement
-      window.addEventListener('DOMContentLoaded', function() {
-        const appName = localStorage.getItem('appName');
-        const color = localStorage.getItem('mainColor');
-        if(appName) document.getElementById('settings-app-name').value = appName;
-        if(color) {
-          document.getElementById('settings-color').value = color;
-          document.documentElement.style.setProperty('--main-color', color);
-          document.querySelectorAll('.admin-menu').forEach(el => el.style.background = `linear-gradient(180deg, ${color} 60%, #1565c0 100%)`);
-          document.querySelectorAll('th').forEach(el => el.style.color = color);
-          document.querySelectorAll('.gerer-ticket-btn').forEach(el => el.style.background = `linear-gradient(90deg, ${color} 60%, #42a5f5 100%)`);
-          document.querySelector('h1').style.color = color;
-        }
-      });
-      // Exportation des tickets en CSV
-      document.getElementById('export-tickets-btn').onclick = function() {
-        db.collection('tickets').get().then((querySnapshot) => {
-          let csv = 'Nom,Email,Application,Titre,Description,Priorité,Date\n';
-          querySnapshot.forEach((doc) => {
-            const d = doc.data();
-            csv += `"${d.lastname||''}","${d.userEmail||d.email||''}","${d.company||''}","${d.title||''}","${d.description||''}","${d.priority||''}","${d.createdAt ? (d.createdAt.seconds ? new Date(d.createdAt.seconds*1000).toLocaleString() : new Date(d.createdAt).toLocaleString()) : ''}"
-`;
-          });
-          const blob = new Blob([csv], {type: 'text/csv'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'tickets.csv';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          document.getElementById('export-success').textContent = "Export CSV généré !";
-        });
-      };
-// --- NOTIFICATIONS ---
-let notifCount = 0;
-let notifList = [];
-const notifBell = document.getElementById('notification-bell');
-const notifBadge = document.getElementById('notif-badge');
-const notifListDiv = document.getElementById('notif-list');
-const notifUl = document.getElementById('notif-ul');
-
-// Afficher/masquer la liste au clic sur la cloche
-notifBell.onclick = function() {
-  notifListDiv.style.display = notifListDiv.style.display === 'none' ? 'block' : 'none';
-  // Marquer toutes les notifications comme vues
-  notifList.forEach(n => n.seen = true);
-  notifCount = notifList.filter(n => !n.seen).length;
-  if (notifCount > 0) {
-    notifBadge.textContent = notifCount;
-    notifBadge.style.display = 'inline-block';
-  } else {
-    notifBadge.style.display = 'none';
-  }
-  renderNotifList();
-};
-
-// Écoute en temps réel des nouveaux tickets
-// (tu peux adapter pour écouter aussi les nouveaux messages dans les sous-collections 'reponses')
-db.collection('tickets').orderBy('createdAt', 'desc').limit(10)
-  .onSnapshot(function(snapshot) {
-    snapshot.docChanges().forEach(function(change) {
-      if (change.type === 'added') {
-        const d = change.doc.data();
-        const titre = d.title || 'Nouveau ticket';
-        const date = d.createdAt ? (d.createdAt.seconds ? new Date(d.createdAt.seconds*1000).toLocaleString() : new Date(d.createdAt).toLocaleString()) : '';
-        notifList.unshift({
-          type: 'ticket',
-          text: `Nouveau ticket : <b>${titre}</b>`,
-          date: date,
-          ticketId: change.doc.id,
-          seen: false
-        });
-        notifCount++;
-        notifBadge.textContent = notifCount;
-        notifBadge.style.display = 'inline-block';
-        renderNotifList();
+      function showSection(section) {
+        dashboardSection.style.display = section === 'dashboard' ? '' : 'none';
+        if (campagnesSection) campagnesSection.style.display = section === 'campagnes' ? '' : 'none';
+        if (usersSection) usersSection.style.display = section === 'users' ? '' : 'none';
+        if (ticketsSection) ticketsSection.style.display = section === 'tickets' ? '' : 'none';
+        if (clientsSection) clientsSection.style.display = section === 'clients' ? '' : 'none';
       }
-    });
-  });
 
-function renderNotifList() {
-  notifUl.innerHTML = '';
-  notifList.slice(0, 10).forEach(n => {
-    let bg = n.seen ? '#fff' : '#e3f0ff';
-    let color = n.seen ? '#1976d2' : '#d32f2f';
-    if(n.type === 'ticket' && n.ticketId) {
-      notifUl.innerHTML += `<li style='padding:12px 18px;border-bottom:1px solid #e3eaf7;font-size:1.05em;cursor:pointer;background:${bg};color:${color};font-weight:${n.seen ? 'normal' : 'bold'};' onclick="window.location.href='gererTicket.html?id=${n.ticketId}'"><span>${n.text}</span><br><span style='color:#888;font-size:0.95em;'>${n.date}</span></li>`;
-    } else {
-      notifUl.innerHTML += `<li style='padding:12px 18px;border-bottom:1px solid #e3eaf7;font-size:1.05em;background:${bg};color:${color};font-weight:${n.seen ? 'normal' : 'bold'};'><span>${n.text}</span><br><span style='color:#888;font-size:0.95em;'>${n.date}</span></li>`;
-    }
-  });
-}
+      document.getElementById('menu-dashboard').onclick = function() { showSection('dashboard'); };
+      document.getElementById('menu-campagnes').onclick = function() {
+        if (!campagnesSection) {
+          campagnesSection = document.createElement('div');
+          campagnesSection.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+              <h2 class="text-xl font-bold text-blue-700">Tableau des campagnes</h2>
+              <div class="flex gap-2">
+                <a href="createAnnonceur.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Créer une campagne</a>
+                <button id="export-campagnes-crud-csv" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">Exporter CSV</button>
+              </div>
+            </div>
+            <div id="campagne-crud-success" class="text-green-600 mb-2"></div>
+            <div id="campagne-crud-error" class="text-red-600 mb-2"></div>
+            <div class="table-responsive w-full" style="max-width:100vw;overflow-x:scroll;">
+              <table id="campagnes-crud-table" class="min-w-[900px] bg-white rounded shadow text-sm">
+                <thead class="bg-blue-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-semibold text-blue-700">Distributeur</th>
+                    <th class="px-3 py-2 text-left">Partenaire</th>
+                    <th class="px-3 py-2 text-left">Nom</th>
+                    <th class="px-3 py-2 text-left">Début</th>
+                    <th class="px-3 py-2 text-left">Fin</th>
+                    <th class="px-3 py-2 text-left">Durée</th>
+                    <th class="px-3 py-2 text-left">Zone</th>
+                    <th class="px-3 py-2 text-left">Style</th>
+                    <th class="px-3 py-2 text-left">Type</th>
+                    <th class="px-3 py-2 text-left">Type de fichier</th>
+                    <th class="px-3 py-2 text-left">Locale/National</th>
+                    <th class="px-3 py-2 text-left">Adresse fournisseur</th>
+                    <th class="px-3 py-2 text-left">Contact</th>
+                    <th class="px-3 py-2 text-left">Rémunération Local</th>
+                    <th class="px-3 py-2 text-left">Rémunération National</th>
+                    <th class="px-3 py-2 text-left">Message</th>
+                    <th class="px-3 py-2 text-left">Images</th>
+                    <th class="px-3 py-2 text-left">Vidéos</th>
+                    <th class="px-3 py-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div id="no-campagnes-crud" class="text-gray-400 mt-2"></div>
+          `;
+          dashboardSection.parentNode.appendChild(campagnesSection);
+
+          // Ajout export CSV pour le tableau CRUD campagnes
+          const exportBtn = campagnesSection.querySelector('#export-campagnes-crud-csv');
+          exportBtn.addEventListener('click', function() {
+            exportTableToCSV('campagnes-crud-table', 'campagnes.csv');
+          });
+        }
+        showSection('campagnes');
+        renderCampagnesCrudTable();
+        // Ajout CRUD
+        const campagneCrudSuccess = document.getElementById('campagne-crud-success');
+        const campagneCrudError = document.getElementById('campagne-crud-error');
+        const addCampagneForm = document.getElementById('add-campagne-form');
+        addCampagneForm.onsubmit = async function(e) {
+          e.preventDefault();
+          campagneCrudSuccess.textContent = '';
+          campagneCrudError.textContent = '';
+          const nom = document.getElementById('add-campagne-nom').value.trim();
+          const partenaire = document.getElementById('add-campagne-partenaire').value.trim();
+          const distributeur = document.getElementById('add-campagne-distributeur').value.trim();
+          if (!nom || !partenaire || !distributeur) {
+            campagneCrudError.textContent = 'Tous les champs sont obligatoires.';
+            return;
+          }
+          try {
+            await db.collection('campagnes').add({
+              nom,
+              partenaire,
+              distributeur,
+              createdAt: new Date()
+            });
+            campagneCrudSuccess.textContent = 'Campagne ajoutée !';
+            addCampagneForm.reset();
+            renderCampagnesCrudTable();
+          } catch (err) {
+            campagneCrudError.textContent = err.message;
+          }
+        };
+        // Remplacer la fonction renderCampagnesCrudTable pour remplir toutes les colonnes
+        function renderCampagnesCrudTable() {
+          const tbody = campagnesSection.querySelector('#campagnes-crud-table tbody');
+          tbody.innerHTML = '';
+          document.getElementById('no-campagnes-crud').textContent = '';
+          db.collection('campagnes').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+            if (querySnapshot.empty) {
+              document.getElementById('no-campagnes-crud').textContent = 'Aucune campagne trouvée.';
+              return;
+            }
+            querySnapshot.forEach((doc) => {
+              const d = doc.data();
+              const images = (d.images||[]).map(url => `<a href="${url}" target="_blank"><img src="${url}" class="inline-block w-10 h-10 object-cover rounded mr-1 mb-1"/></a>`).join('');
+              const videos = (d.videos||[]).map(url => `<a href="${url}" target="_blank" class="text-blue-600">🎬</a>`).join(' ');
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td class="px-3 py-2">${d.distributeur||''}</td>
+                <td class="px-3 py-2">${d.partenaire||''}</td>
+                <td class="px-3 py-2">${d.nom||''}</td>
+                <td class="px-3 py-2">${d.debut||''}</td>
+                <td class="px-3 py-2">${d.fin||''}</td>
+                <td class="px-3 py-2">${d.duree||''}</td>
+                <td class="px-3 py-2">${d.zone||''}</td>
+                <td class="px-3 py-2">${d.style||''}</td>
+                <td class="px-3 py-2">${d.type||''}</td>
+                <td class="px-3 py-2">${d.typeFichier||''}</td>
+                <td class="px-3 py-2">${d.localNational||''}</td>
+                <td class="px-3 py-2">${d.adresse||''}</td>
+                <td class="px-3 py-2">${d.contact||''}</td>
+                <td class="px-3 py-2 text-green-700 font-bold">${d.remunerationLocal ? d.remunerationLocal + ' €' : ''}</td>
+                <td class="px-3 py-2 text-blue-700 font-bold">${d.remunerationNational ? d.remunerationNational + ' €' : ''}</td>
+                <td class="px-3 py-2 max-w-xs truncate">${d.details||''}</td>
+                <td class="px-3 py-2">${images}</td>
+                <td class="px-3 py-2">${videos}</td>
+                <td class="px-3 py-2">
+                  <button class="text-blue-600 hover:underline mr-2" onclick="editCampagne('${doc.id}','${d.nom||''}','${d.partenaire||''}','${d.distributeur||''}')">Modifier</button>
+                  <button class="text-red-600 hover:underline" onclick="deleteCampagne('${doc.id}','${d.nom||''}')">Supprimer</button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          });
+        }
+        window.editCampagne = function(id, nom, partenaire, distributeur) {
+          const newNom = prompt('Nouveau nom pour la campagne ?', nom);
+          if (!newNom) return;
+          const newPartenaire = prompt('Nouveau partenaire ?', partenaire);
+          if (!newPartenaire) return;
+          const newDistributeur = prompt('Nouveau distributeur ?', distributeur);
+          if (!newDistributeur) return;
+          db.collection('campagnes').doc(id).update({ nom: newNom, partenaire: newPartenaire, distributeur: newDistributeur }).then(() => {
+            campagneCrudSuccess.textContent = 'Campagne modifiée !';
+            renderCampagnesCrudTable();
+          }).catch(e => { campagneCrudError.textContent = e.message; });
+        };
+        window.deleteCampagne = function(id, nom) {
+          if (!confirm('Supprimer la campagne ' + nom + ' ?')) return;
+          db.collection('campagnes').doc(id).delete().then(() => {
+            campagneCrudSuccess.textContent = 'Campagne supprimée !';
+            renderCampagnesCrudTable();
+          }).catch(e => { campagneCrudError.textContent = e.message; });
+        };
+      };
+      document.getElementById('menu-users').onclick = function() {
+        if (!usersSection) {
+          usersSection = document.createElement('div');
+          usersSection.innerHTML = `
+            <h2 class="text-xl font-bold text-blue-700 mb-4">Tableau des utilisateurs</h2>
+            <form id="add-user-form" class="mb-6 flex flex-col sm:flex-row gap-2 items-end">
+              <input type="email" id="add-user-email" required placeholder="Email" class="border border-gray-300 rounded px-3 py-2" />
+              <input type="password" id="add-user-password" required minlength="6" placeholder="Mot de passe" class="border border-gray-300 rounded px-3 py-2" />
+              <select id="add-user-role" required class="border border-gray-300 rounded px-3 py-2">
+                <option value="">Rôle</option>
+                <option value="Admin">Admin</option>
+                <option value="Campagne">Campagne</option>
+                <option value="Tickets">Tickets</option>
+              </select>
+              <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Ajouter</button>
+            </form>
+            <div id="user-crud-success" class="text-green-600 mb-2"></div>
+            <div id="user-crud-error" class="text-red-600 mb-2"></div>
+            <div class="overflow-x-auto max-w-full">
+              <table id="users-table" class="min-w-full bg-white rounded shadow text-sm">
+                <thead class="bg-blue-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-semibold text-blue-700">Email</th>
+                    <th class="px-3 py-2 text-left">Date de création</th>
+                    <th class="px-3 py-2 text-left">Rôle</th>
+                    <th class="px-3 py-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div id="no-users" class="text-gray-400 mt-2"></div>
+          `;
+          dashboardSection.parentNode.appendChild(usersSection);
+        }
+        showSection('users');
+        // Remplir le tableau utilisateurs
+        const tbody = usersSection.querySelector('#users-table tbody');
+        tbody.innerHTML = '';
+        document.getElementById('no-users').textContent = '';
+        db.collection('users').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            document.getElementById('no-users').textContent = 'Aucun utilisateur trouvé.';
+            return;
+          }
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            let date = '';
+            if (data.createdAt) {
+              date = data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString();
+            }
+            tr.innerHTML = `
+              <td class="px-3 py-2">${data.email || ''}</td>
+              <td class="px-3 py-2">${date}</td>
+              <td class="px-3 py-2">${data.role || ''}</td>
+              <td class="px-3 py-2">
+                <button class="text-blue-600 hover:underline mr-2" onclick="editUser('${doc.id}','${data.email}','${data.role}')">Modifier</button>
+                <button class="text-red-600 hover:underline" onclick="deleteUser('${doc.id}','${data.email}')">Supprimer</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+      };
+      document.getElementById('menu-tickets').onclick = function() {
+        if (!ticketsSection) {
+          ticketsSection = document.createElement('div');
+          ticketsSection.innerHTML = `
+            <h2 class="text-xl font-bold text-blue-700 mb-4">Tableau des tickets</h2>
+            <div class="table-responsive w-full" style="max-width:100vw;overflow-x:scroll;">
+              <table id="tickets-table" class="min-w-full bg-white rounded shadow text-sm">
+                <thead class="bg-blue-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-semibold text-blue-700">Entreprise</th>
+                    <th class="px-3 py-2 text-left">Titre</th>
+                    <th class="px-3 py-2 text-left">Message</th>
+                    <th class="px-3 py-2 text-left">Priorité</th>
+                    <th class="px-3 py-2 text-left">Créé le</th>
+                    <th class="px-3 py-2 text-left">Utilisateur</th>
+                    <th class="px-3 py-2 text-left">État</th>
+                    <th class="px-3 py-2 text-left">Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div id="no-tickets" class="text-gray-400 mt-2"></div>
+          `;
+          dashboardSection.parentNode.appendChild(ticketsSection);
+        }
+        showSection('tickets');
+        renderTicketsTable();
+        function renderTicketsTable() {
+          const tbody = ticketsSection.querySelector('#tickets-table tbody');
+          tbody.innerHTML = '';
+          document.getElementById('no-tickets').textContent = '';
+          db.collection('tickets').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+            if (querySnapshot.empty) {
+              document.getElementById('no-tickets').textContent = 'Aucun ticket trouvé.';
+              return;
+            }
+            querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              let date = '';
+              if (data.createdAt) {
+                date = data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString();
+              }
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td class="px-3 py-2">${data.company || ''}</td>
+                <td class="px-3 py-2">${data.title || ''}</td>
+                <td class="px-3 py-2 max-w-xs truncate" title="${data.description || ''}">${data.description || ''}</td>
+                <td class="px-3 py-2">${data.priority || ''}</td>
+                <td class="px-3 py-2">${date}</td>
+                <td class="px-3 py-2">${data.userEmail || data.lastname || ''}</td>
+                <td class="px-3 py-2">${data.statut || ''}</td>
+                <td class="px-3 py-2">
+                  <button class="text-blue-600 hover:underline mr-2" onclick="editTicket('${doc.id}','${data.statut||''}')">Changer statut</button>
+                  <button class="text-red-600 hover:underline" onclick="deleteTicket('${doc.id}')">Supprimer</button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          });
+        }
+        window.editTicket = function(id, statut) {
+          const newStatut = prompt('Nouveau statut du ticket ?', statut);
+          if (!newStatut) return;
+          db.collection('tickets').doc(id).update({ statut: newStatut }).then(() => {
+            renderTicketsTable();
+          });
+        };
+        window.deleteTicket = function(id) {
+          if (!confirm('Supprimer ce ticket ?')) return;
+          db.collection('tickets').doc(id).delete().then(() => {
+            renderTicketsTable();
+          });
+        };
+      };
+      document.getElementById('menu-clients').onclick = function() {
+        if (!clientsSection) {
+          clientsSection = document.createElement('div');
+          clientsSection.innerHTML = `
+            <h2 class="text-xl font-bold text-blue-700 mb-4">Tableau des clients</h2>
+            <div class="overflow-x-auto max-w-full">
+              <table id="clients-table" class="min-w-full bg-white rounded shadow text-sm">
+                <thead class="bg-blue-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left font-semibold text-blue-700">Email</th>
+                    <th class="px-3 py-2 text-left">Nom</th>
+                    <th class="px-3 py-2 text-left">Date de modification</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div id="no-clients" class="text-gray-400 mt-2"></div>
+          `;
+          dashboardSection.parentNode.appendChild(clientsSection);
+        }
+        showSection('clients');
+        renderClientsTable();
+        function renderClientsTable() {
+          const tbody = clientsSection.querySelector('#clients-table tbody');
+          tbody.innerHTML = '';
+          document.getElementById('no-clients').textContent = '';
+          db.collection('utilisateur').orderBy('updatedAt', 'desc').get().then((querySnapshot) => {
+            if (querySnapshot.empty) {
+              document.getElementById('no-clients').textContent = 'Aucun client trouvé.';
+              return;
+            }
+            querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              let date = '';
+              if (data.updatedAt) {
+                date = data.updatedAt.seconds ? new Date(data.updatedAt.seconds * 1000).toLocaleString() : new Date(data.updatedAt).toLocaleString();
+              }
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td class="px-3 py-2">${data.email || ''}</td>
+                <td class="px-3 py-2">${data.lastname || ''}</td>
+                <td class="px-3 py-2">${date}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+          });
+        }
+      };
+      // CRUD JS
+      const crudSuccess = document.getElementById('user-crud-success');
+      const crudError = document.getElementById('user-crud-error');
+      const addUserForm = document.getElementById('add-user-form');
+      addUserForm.onsubmit = async function(e) {
+        e.preventDefault();
+        crudSuccess.textContent = '';
+        crudError.textContent = '';
+        const email = document.getElementById('add-user-email').value.trim();
+        const password = document.getElementById('add-user-password').value;
+        const role = document.getElementById('add-user-role').value;
+        if (!email || !password || !role) {
+          crudError.textContent = 'Tous les champs sont obligatoires.';
+          return;
+        }
+        try {
+          // Création utilisateur Auth + Firestore
+          const admin = firebase.auth().currentUser;
+          const adminEmail = admin.email;
+          const adminPwd = prompt('Pour créer un utilisateur, entrez à nouveau votre mot de passe admin :');
+          await firebase.auth().createUserWithEmailAndPassword(email, password);
+          const newUser = firebase.auth().currentUser;
+          await db.collection('users').doc(newUser.uid).set({ email, createdAt: new Date(), role });
+          crudSuccess.textContent = 'Utilisateur ajouté !';
+          addUserForm.reset();
+          await firebase.auth().signOut();
+          await firebase.auth().signInWithEmailAndPassword(adminEmail, adminPwd);
+          renderUsersTable();
+        } catch (err) {
+          crudError.textContent = err.message;
+          try { await firebase.auth().signInWithEmailAndPassword(adminEmail, adminPwd); } catch {}
+        }
+      };
+      function renderUsersTable() {
+        const tbody = usersSection.querySelector('#users-table tbody');
+        tbody.innerHTML = '';
+        document.getElementById('no-users').textContent = '';
+        db.collection('users').orderBy('createdAt', 'desc').get().then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            document.getElementById('no-users').textContent = 'Aucun utilisateur trouvé.';
+            return;
+          }
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            let date = '';
+            if (data.createdAt) {
+              date = data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000).toLocaleString() : new Date(data.createdAt).toLocaleString();
+            }
+            tr.innerHTML = `
+              <td class="px-3 py-2">${data.email || ''}</td>
+              <td class="px-3 py-2">${date}</td>
+              <td class="px-3 py-2">${data.role || ''}</td>
+              <td class="px-3 py-2">
+                <button class="text-blue-600 hover:underline mr-2" onclick="editUser('${doc.id}','${data.email}','${data.role}')">Modifier</button>
+                <button class="text-red-600 hover:underline" onclick="deleteUser('${doc.id}','${data.email}')">Supprimer</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+      }
+      window.editUser = function(id, email, role) {
+        const newRole = prompt('Nouveau rôle pour ' + email + ' ?', role);
+        if (!newRole) return;
+        db.collection('users').doc(id).update({ role: newRole }).then(() => {
+          crudSuccess.textContent = 'Rôle mis à jour !';
+          renderUsersTable();
+        }).catch(e => { crudError.textContent = e.message; });
+      };
+      window.deleteUser = function(id, email) {
+        if (!confirm('Supprimer l’utilisateur ' + email + ' ?')) return;
+        db.collection('users').doc(id).delete().then(() => {
+          crudSuccess.textContent = 'Utilisateur supprimé !';
+          renderUsersTable();
+        }).catch(e => { crudError.textContent = e.message; });
+      };
+      renderUsersTable();
+      // Fonction d'export CSV pour le tableau des campagnes
+      function exportTableToCSV(tableId, filename) {
+        const table = document.getElementById(tableId);
+        let csv = [];
+        const rows = table.querySelectorAll('tr');
+        for (let i = 0; i < rows.length; i++) {
+          let row = [], cols = rows[i].querySelectorAll('th, td');
+          for (let j = 0; j < cols.length - 1; j++) { // -1 pour ignorer la colonne Actions
+            let text = cols[j].innerText.replace(/\n/g, ' ').replace(/\s+/g, ' ').replace(/"/g, '""');
+            row.push('"' + text + '"');
+          }
+          csv.push(row.join(','));
+        }
+        const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+        const downloadLink = document.createElement('a');
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      }
+      document.getElementById('export-campagnes-csv').addEventListener('click', function() {
+        exportTableToCSV('campagnes-table', 'campagnes.csv');
+      });
     </script>
-    <!-- Ajout de la bibliothèque PapaParse pour la conversion en CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

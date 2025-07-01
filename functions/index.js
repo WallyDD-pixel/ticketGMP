@@ -92,3 +92,64 @@ exports.createUser = functions.https.onRequest(async (req, res) => {
     return res.status(400).send({ error: err.message });
   }
 });
+
+// Nouvelle fonction : Envoi automatique de newsletters
+exports.sendNewsletter = functions.firestore.onDocumentCreated(
+  'newsletters/{newsletterId}',
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return null;
+    
+    const newsletter = snap.data();
+    const { title, content, image, recipients, createdAt } = newsletter;
+    
+    if (!recipients || recipients.length === 0) {
+      console.log('Aucun destinataire pour cette newsletter');
+      return null;
+    }
+
+    // Préparation du contenu HTML
+    let htmlContent = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff;">
+        <div style="background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%); padding: 20px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">${title}</h1>
+        </div>
+        <div style="padding: 30px 20px;">
+          ${content}
+        </div>
+        <div style="background: #f5f5f5; padding: 15px 20px; text-align: center; font-size: 12px; color: #888;">
+          <p>Newsletter envoyée le ${createdAt ? new Date(createdAt.seconds * 1000).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')}</p>
+          <p>© GMP - Ce message est automatique, merci de ne pas répondre.</p>
+        </div>
+      </div>
+    `;
+
+    // Envoi à tous les destinataires
+    const promises = recipients.map(async (email) => {
+      const mailOptions = {
+        from: `GMP Newsletter <${gmailEmail}>`,
+        to: email,
+        subject: title,
+        html: htmlContent
+      };
+
+      try {
+        await mailTransport.sendMail(mailOptions);
+        console.log(`Newsletter envoyée à ${email}`);
+      } catch (error) {
+        console.error(`Erreur envoi newsletter à ${email}:`, error);
+      }
+    });
+
+    await Promise.all(promises);
+    
+    // Marquer la newsletter comme envoyée
+    await snap.ref.update({
+      sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      status: 'sent'
+    });
+
+    console.log(`Newsletter "${title}" envoyée à ${recipients.length} destinataires`);
+    return null;
+  }
+);

@@ -4,102 +4,69 @@
   <meta charset="UTF-8">
   <title>Dashboard Utilisateur</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="user-panel.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
 </head>
-<body>
-  <div class="user-dashboard">
-    <div class="user-header">
-      <div class="user-avatar" id="user-avatar">👤</div>
-      <div class="user-header-info">
-        <h2 id="user-name">Mon espace</h2>
-        <div class="user-email" id="user-email"></div>
-        <div class="user-date" id="user-created"></div>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-6xl mx-auto py-8 px-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <div id="user-avatar" class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-700"></div>
+        <div>
+          <div id="user-email" class="font-semibold text-gray-700"></div>
+          <div id="user-created" class="text-xs text-gray-400"></div>
+        </div>
       </div>
-      <div class="user-actions">
-        <button class="btn-main" id="change-password-btn">Changer mon mot de passe</button>
-        <button class="btn-main btn-logout" id="logout-btn">Se déconnecter</button>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-value" id="stat-tickets">0</div>
-        <div class="stat-label">Tickets</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-tickets-open">0</div>
-        <div class="stat-label">Tickets ouverts</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-tickets-closed">0</div>
-        <div class="stat-label">Tickets fermés</div>
+      <div class="flex gap-2">
+        <button id="change-password-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Changer mon mot de passe</button>
+        <button id="logout-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">Se déconnecter</button>
       </div>
     </div>
-    <div class="success" id="user-success"></div>
-    <div class="error" id="user-error"></div>
-    <div class="tickets-section">
-      <h4>Mes tickets</h4>
-      <div id="no-tickets" style="color:#888;"></div>
-      <table class="tickets-table" id="user-tickets-table" style="display:none;">
-        <thead>
+    <!-- Tableau des tickets utilisateur -->
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <h2 class="text-xl font-bold text-blue-700">Mes tickets</h2>
+      <div class="flex items-center gap-3">
+        <span id="stat-tickets" class="inline-block bg-blue-100 text-blue-700 font-bold rounded-full px-4 py-1 text-sm"></span>
+        <a href="createTicket.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm whitespace-nowrap">Créer un ticket</a>
+      </div>
+    </div>
+    <div id="no-tickets" class="text-gray-400 mb-2"></div>
+    <div class="overflow-x-auto">
+      <table id="tickets-table" class="min-w-full bg-white rounded shadow text-sm" style="display:none;">
+        <thead class="bg-blue-50">
           <tr>
-            <th>Titre</th>
-            <th>Date</th>
-            <th>Priorité</th>
-            <th>État</th>
-            <th>Description</th>
+            <th class="px-3 py-2 text-left font-semibold text-blue-700">Titre</th>
+            <th class="px-3 py-2 text-left">Service</th>
+            <th class="px-3 py-2 text-left">Description</th>
+            <th class="px-3 py-2 text-left">Priorité</th>
+            <th class="px-3 py-2 text-left">Créé le</th>
+            <th class="px-3 py-2 text-left">Statut</th>
+            <th class="px-3 py-2 text-left">Action</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-    <div class="tickets-section">
-      <h4>Mes campagnes</h4>
-      <div id="no-campagnes" style="color:#888;"></div>
-      <table class="tickets-table" id="user-campagnes-table" style="display:none;">
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Début</th>
-            <th>Fin</th>
-            <th>Zone</th>
-            <th>Type</th>
-            <th>Message</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+    <div id="user-success" class="text-green-600 mt-4"></div>
+    <div id="user-error" class="text-red-600 mt-2"></div>
   </div>
   <script>
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
+    let tickets = [];
     auth.onAuthStateChanged(async function(user) {
       if (!user) {
         window.location.href = "index.html";
         return;
       }
-      // Vérification du rôle
-      const userDoc = await db.collection('users').doc(user.uid).get();
-      let role = '';
-      if (userDoc.exists && userDoc.data().role) {
-        role = userDoc.data().role.trim().toLowerCase();
-      }
-      if (role !== 'ticket') {
-        // Redirige si ce n'est pas un utilisateur "tickets"
-        window.location.href = "index.html";
-        return;
-      }
-      // Avatar (initiale ou icône)
       document.getElementById('user-avatar').textContent = user.email ? user.email[0].toUpperCase() : '👤';
       document.getElementById('user-email').textContent = user.email;
       // Date d'inscription
+      const userDoc = await db.collection('users').doc(user.uid).get();
       let created = '';
       if (userDoc.exists && userDoc.data().createdAt) {
         const d = userDoc.data().createdAt;
@@ -108,64 +75,43 @@
         created = new Date(user.metadata.creationTime).toLocaleString();
       }
       document.getElementById('user-created').textContent = 'Inscrit le : ' + created;
-      // Tickets stats et affichage
-      const ticketsSnap = await db.collection('tickets').where('userEmail', '==', user.email).get();
-      const tickets = [];
-      let open = 0, closed = 0;
+      // Afficher tous les tickets sans filtre
+      const ticketsSnap = await db.collection('tickets').orderBy('createdAt', 'desc').get();
+      tickets = [];
       ticketsSnap.forEach(doc => {
         const t = doc.data();
-        t._id = doc.id; // Ajout de l'ID du ticket
+        t._id = doc.id;
         tickets.push(t);
-        if (t.etat && t.etat.toLowerCase() === 'fermé') closed++;
-        else open++;
       });
-      document.getElementById('stat-tickets').textContent = tickets.length;
-      document.getElementById('stat-tickets-open').textContent = open;
-      document.getElementById('stat-tickets-closed').textContent = closed;
-      // Affichage tickets
-      const table = document.getElementById('user-tickets-table');
-      const tbody = table.querySelector('tbody');
-      tbody.innerHTML = '';
-      if (tickets.length === 0) {
+      document.getElementById('stat-tickets').textContent = tickets.length + ' ticket' + (tickets.length > 1 ? 's' : '');
+      renderTicketsTable(tickets);
+    });
+    function renderTicketsTable(data) {
+      const tableTickets = document.getElementById('tickets-table');
+      const tbodyTickets = tableTickets.querySelector('tbody');
+      tbodyTickets.innerHTML = '';
+      if (data.length === 0) {
         document.getElementById('no-tickets').textContent = 'Aucun ticket trouvé.';
-        table.style.display = 'none';
+        tableTickets.style.display = 'none';
       } else {
         document.getElementById('no-tickets').textContent = '';
-        table.style.display = '';
-        tickets.forEach(t => {
+        tableTickets.style.display = '';
+        data.forEach(t => {
           const tr = document.createElement('tr');
-          tr.style.cursor = 'pointer';
-          tr.onclick = function() {
-            window.location.href = `gererTicket.html?id=${t._id}`;
-          };
-          tr.innerHTML = `<td>${t.title||''}</td><td>${t.createdAt ? (t.createdAt.seconds ? new Date(t.createdAt.seconds*1000).toLocaleString() : new Date(t.createdAt).toLocaleString()) : ''}</td><td>${t.priority||''}</td><td>${t.etat||'Nouveau'}</td><td>${t.description||''}</td>`;
-          tbody.appendChild(tr);
+          tr.className = 'hover:bg-blue-50';
+          tr.innerHTML = `
+            <td class="px-3 py-2 font-semibold text-blue-700">${t.title||''}</td>
+            <td class="px-3 py-2">${t.company||''}</td>
+            <td class="px-3 py-2 max-w-xs truncate" title="${t.description||''}">${t.description||''}</td>
+            <td class="px-3 py-2">${t.priority||''}</td>
+            <td class="px-3 py-2">${t.createdAt ? (t.createdAt.seconds ? new Date(t.createdAt.seconds * 1000).toLocaleString() : new Date(t.createdAt).toLocaleString()) : ''}</td>
+            <td class="px-3 py-2">${t.statut||'Ouvert'}</td>
+            <td class="px-3 py-2"><a href="gererTicket.html?id=${t._id}" class="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Voir</a></td>
+          `;
+          tbodyTickets.appendChild(tr);
         });
       }
-      // Affichage campagnes de l'utilisateur
-      const campagnesSnap = await db.collection('campagnes').where('userEmail', '==', user.email).get();
-      const campagnes = [];
-      campagnesSnap.forEach(doc => {
-        const c = doc.data();
-        campagnes.push(c);
-      });
-      const tableCamp = document.getElementById('user-campagnes-table');
-      const tbodyCamp = tableCamp.querySelector('tbody');
-      tbodyCamp.innerHTML = '';
-      if (campagnes.length === 0) {
-        document.getElementById('no-campagnes').textContent = 'Aucune campagne trouvée.';
-        tableCamp.style.display = 'none';
-      } else {
-        document.getElementById('no-campagnes').textContent = '';
-        tableCamp.style.display = '';
-        campagnes.forEach(c => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${c.nom||''}</td><td>${c.debut||''}</td><td>${c.fin||''}</td><td>${c.zone||''}</td><td>${c.type||''}</td><td>${c.details||''}</td>`;
-          tbodyCamp.appendChild(tr);
-        });
-      }
-    });
-    // Changer le mot de passe
+    }
     document.getElementById('change-password-btn').onclick = function() {
       const user = auth.currentUser;
       if (!user) return;
@@ -179,7 +125,6 @@
           document.getElementById('user-success').textContent = '';
         });
     };
-    // Déconnexion
     document.getElementById('logout-btn').onclick = function() {
       auth.signOut().then(() => {
         window.location.href = "index.html";
