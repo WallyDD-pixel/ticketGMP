@@ -181,6 +181,7 @@
           <td>${videos}</td>
           <td>
             <button class="btn-main" onclick="window.location.href='gererCampagne.html?id=${d.id}'">Voir</button>
+            <button class="btn-main" onclick="generateFactureFromDb('${d.id}')">Générer une facture</button>
           </td>
         `;
         tbody.appendChild(tr);

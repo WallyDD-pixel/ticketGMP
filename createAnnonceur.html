@@ -1,429 +1,502 @@
-<!-- Formulaire de création de campagne -->
-<style>
-  body {
-    background: #f5f7fa;
-    font-family: 'Segoe UI', Arial, sans-serif;
-  }
-  .logo-gmp {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 18px;
-  }
-  .logo-gmp img {
-    width: 120px;
-    height: auto;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 2px 8px #b3c6e0);
-    border-radius: 12px;
-    background: #fff;
-    padding: 8px 16px;
-  }
-  .logo-gmp span {
-    font-size: 1.15em;
-    color: #1976d2;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-top: 2px;
-    text-shadow: 0 1px 2px #e3eaf5;
-  }
-  .campagne-container {
-    max-width: 500px;
-    margin: 48px auto;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 36px rgba(25, 118, 210, 0.13), 0 2px 8px rgba(25, 118, 210, 0.10);
-    padding: 40px 36px 32px 36px;
-    border: 2px solid #1976d2;
-    background: linear-gradient(120deg, #f5f7fa 80%, #e3eaf5 100%);
-  }
-  .campagne-container h1 {
-    text-align: center;
-    color: #1976d2;
-    margin-bottom: 32px;
-    font-size: 2.1em;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
-  #campagne-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    margin-top: 8px;
-  }
-  .form-row {
-    display: flex;
-    gap: 48px; /* Espace augmenté entre les deux inputs */
-    margin-bottom: 0;
-  }
-  .form-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  #campagne-form label {
-    font-weight: 600;
-    color: #1976d2;
-    margin-top: 18px;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
-  }
-  #campagne-form input,
-  #campagne-form textarea {
-    width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 0;
-    border: 1.5px solid #b3c6e0;
-    border-radius: 7px;
-    font-size: 1.08em;
-    background: #f7fafd;
-    transition: border 0.2s;
-    box-sizing: border-box;
-    outline: none;
-  }
-  #campagne-form input:focus, #campagne-form textarea:focus {
-    border: 1.5px solid #1976d2;
-    background: #f0f6ff;
-  }
-  #campagne-form button {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.15em;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 24px;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
-    transition: background 0.2s, box-shadow 0.2s;
-    letter-spacing: 0.5px;
-  }
-  #campagne-form button:hover {
-    background: linear-gradient(90deg, #1256a3 60%, #1976d2 100%);
-    box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
-  }
-  #campagne-form input[type="file"] {
-    background: #f7fafd;
-    border: none;
-    margin-bottom: 18px;
-    font-size: 1em;
-    padding: 0;
-  }
-  #uploadProgress {
-    margin: 10px 0 18px 0;
-    height: 8px;
-    border-radius: 5px;
-    width: 100%;
-    background: #e3eaf5;
-    accent-color: #1976d2;
-  }
-  .success, .error {
-    margin-top: 22px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1.08em;
-  }
-  #preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px;
-    margin: 18px 0 0 0;
-    align-items: flex-start;
-  }
-  #preview img, #preview video {
-    max-width: 120px;
-    max-height: 90px;
-    border-radius: 7px;
-    box-shadow: 0 2px 8px #b3c6e0;
-    object-fit: cover;
-    background: #f7fafd;
-  }
-  #campagne-form select {
-    width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 0;
-    border: 1.5px solid #b3c6e0;
-    border-radius: 7px;
-    font-size: 1.08em;
-    background: #f7fafd;
-    color: #1976d2;
-    transition: border 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%231976d2" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 22px 22px;
-    cursor: pointer;
-  }
-  #campagne-form select:focus {
-    border: 1.5px solid #1976d2;
-    background: #f0f6ff;
-    box-shadow: 0 0 0 2px #1976d233;
-  }
-  #campagne-form option {
-    color: #222;
-    background: #fff;
-    font-size: 1em;
-  }
-  @media (max-width: 700px) {
-    .form-row {
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créer une campagne</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    html, body { max-width: 100vw; overflow-x: hidden; }
+    body {
+      background: #f5f7fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .campagne-container {
+      max-width: 500px;
+      margin: 48px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 36px rgba(25, 118, 210, 0.13), 0 2px 8px rgba(25, 118, 210, 0.10);
+      padding: 40px 36px 32px 36px;
+      border: 2px solid #1976d2;
+      background: linear-gradient(120deg, #f5f7fa 80%, #e3eaf5 100%);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .logo-gmp {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .logo-gmp img {
+      width: 120px;
+      height: auto;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 2px 8px #b3c6e0);
+      border-radius: 12px;
+      background: #fff;
+      padding: 8px 16px;
+    }
+    .logo-gmp span {
+      font-size: 1.15em;
+      color: #1976d2;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-top: 2px;
+      text-shadow: 0 1px 2px #e3eaf5;
+    }
+    .campagne-container h1 {
+      text-align: center;
+      color: #1976d2;
+      margin-bottom: 32px;
+      font-size: 2.1em;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    #campagne-form {
+      display: flex;
       flex-direction: column;
       gap: 0;
+      margin-top: 8px;
     }
-  }
-</style>
-<div class="campagne-container">
-  <div class="logo-gmp">
-    <img src="gmp modif.png" alt="Logo GMP">
-    <span>GLOBAL MEDIAS PUB</span>
-  </div>
-  <h1>Créer une campagne</h1>
-  <form id="campagne-form" enctype="multipart/form-data">
-    <div class="form-row">
-      <div class="form-col">
-        <label for="distributeur">NOM distributeur :</label>
-        <input type="text" id="distributeur" name="distributeur" required>
-      </div>
-      <div class="form-col">
-        <label for="partenaire">Nom Partenaire :</label>
-        <select id="partenaire" name="partenaire" required>
-          <option value="">Sélectionner un partenaire</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="email">Email :</label>
-        <input type="email" id="email" name="email" required>
-      </div>
-      <div class="form-col">
-        <label for="nom">Nom de la Campagne :</label>
-        <input type="text" id="nom" name="nom" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="debut">Début Campagne :</label>
-        <input type="date" id="debut" name="debut" required>
-      </div>
-      <div class="form-col">
-        <label for="duree">Durée de Campagne :</label>
-        <input type="text" id="duree" name="duree" placeholder="Ex: 1 Mois, 2 Semaines" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="style">Style Campagne :</label>
-        <input type="text" id="style" name="style" required>
-      </div>
-      <div class="form-col">
-        <label for="type">Type de campagne :</label>
-        <input type="text" id="type" name="type" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="typeFichier">Type de fichier reçu campagne :</label>
-        <input type="text" id="typeFichier" name="typeFichier" placeholder="Ex: image, vidéo, pdf">
-      </div>
-      <div class="form-col">
-        <label for="localNational">Campagne Locale ou National :</label>
-        <select id="localNational" name="localNational" required>
-          <option value="">Sélectionner</option>
-          <option value="Local">Local</option>
-          <option value="National">National</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="adresse">Adresse fournisseur :</label>
-        <input type="text" id="adresse" name="adresse" required>
-      </div>
-      <div class="form-col">
-        <label for="contact">Contact campagne :</label>
-        <input type="text" id="contact" name="contact" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col">
-        <label for="remunerationLocal">Rémunération Local (€) :</label>
-        <input type="number" id="remunerationLocal" name="remunerationLocal" min="0" step="0.01" required>
-      </div>
-      <div class="form-col">
-        <label for="remunerationNational">Rémunération National (€) :</label>
-        <input type="number" id="remunerationNational" name="remunerationNational" min="0" step="0.01" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-col" style="width:100%">
-        <label for="details">Message :</label>
-        <textarea id="details" name="details" rows="4" placeholder="Exprimez-vous librement ici..." required></textarea>
-      </div>
-    </div>
-    <label for="media">Images ou vidéos :</label>
-    <input type="file" id="media" name="media" accept="image/*,video/*" multiple required>
-    <div id="preview"></div>
-    <progress id="uploadProgress" value="0" max="100" style="width:100%; display:none;"></progress>
-    <button type="submit">Créer la campagne</button>
-    <div class="success" id="success"></div>
-    <div class="error" id="error"></div>
-  </form>
-</div>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script>
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const storage = firebase.storage();
-
-  document.getElementById('campagne-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const successDiv = document.getElementById('success');
-    const errorDiv = document.getElementById('error');
-    const progressBar = document.getElementById('uploadProgress');
-    successDiv.textContent = '';
-    errorDiv.textContent = '';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Envoi en cours...';
-    try {
-      const distributeur = document.getElementById('distributeur').value.trim();
-      const partenaire = document.getElementById('partenaire').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const nom = document.getElementById('nom').value.trim();
-      const debut = document.getElementById('debut').value;
-      const duree = document.getElementById('duree').value.trim();
-      const style = document.getElementById('style').value.trim();
-      const type = document.getElementById('type').value.trim();
-      const typeFichier = document.getElementById('typeFichier').value.trim();
-      const localNational = document.getElementById('localNational').value;
-      const adresse = document.getElementById('adresse').value.trim();
-      const contact = document.getElementById('contact').value.trim();
-      const remunerationLocal = document.getElementById('remunerationLocal').value.trim();
-      const remunerationNational = document.getElementById('remunerationNational').value.trim();
-      const details = document.getElementById('details').value.trim();
-      const mediaInput = document.getElementById('media');
-      const files = Array.from(mediaInput.files);
-      if (files.length === 0) throw new Error('Veuillez sélectionner au moins un fichier image ou vidéo.');
-      // Upload media
-      const imageUrls = [];
-      const videoUrls = [];
-      for (const file of files) {
-        const ext = file.name.split('.').pop().toLowerCase();
-        const isImage = file.type.startsWith('image/');
-        const isVideo = file.type.startsWith('video/');
-        let folder = '';
-        if (isImage) folder = 'images';
-        else if (isVideo) folder = 'videos';
-        else continue; // skip unsupported
-        const storageRef = storage.ref().child(`campagnes/${folder}/${Date.now()}_${Math.floor(Math.random()*10000)}_${file.name}`);
-        progressBar.style.display = 'block';
-        progressBar.value = 0;
-        await new Promise((resolve, reject) => {
-          const uploadTask = storageRef.put(file);
-          uploadTask.on('state_changed', 
-            (snapshot) => {
-              const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              progressBar.value = percent;
-            }, 
-            (error) => reject(error),
-            async () => {
-              const url = await uploadTask.snapshot.ref.getDownloadURL();
-              if (isImage) imageUrls.push(url);
-              if (isVideo) videoUrls.push(url);
-              resolve();
-            }
-          );
-        });
+    .form-row {
+      display: flex;
+      gap: 48px;
+      margin-bottom: 0;
+    }
+    .form-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #campagne-form label {
+      font-weight: 600;
+      color: #1976d2;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    #campagne-form input,
+    #campagne-form textarea {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 0;
+      border: 1.5px solid #b3c6e0;
+      border-radius: 7px;
+      font-size: 1.08em;
+      background: #f7fafd;
+      transition: border 0.2s;
+      box-sizing: border-box;
+      outline: none;
+    }
+    #campagne-form input:focus, #campagne-form textarea:focus {
+      border: 1.5px solid #1976d2;
+      background: #f0f6ff;
+    }
+    #campagne-form button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.15em;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 24px;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+      transition: background 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.5px;
+    }
+    #campagne-form button:hover {
+      background: linear-gradient(90deg, #1256a3 60%, #1976d2 100%);
+      box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+    }
+    #campagne-form input[type="file"] {
+      background: #f7fafd;
+      border: none;
+      margin-bottom: 18px;
+      font-size: 1em;
+      padding: 0;
+    }
+    #uploadProgress {
+      margin: 10px 0 18px 0;
+      height: 8px;
+      border-radius: 5px;
+      width: 100%;
+      background: #e3eaf5;
+      accent-color: #1976d2;
+    }
+    .success, .error {
+      margin-top: 22px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.08em;
+    }
+    #preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 18px 0 0 0;
+      align-items: flex-start;
+    }
+    #preview img, #preview video {
+      max-width: 120px;
+      max-height: 90px;
+      border-radius: 7px;
+      box-shadow: 0 2px 8px #b3c6e0;
+      object-fit: cover;
+      background: #f7fafd;
+    }
+    #campagne-form select {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 0;
+      border: 1.5px solid #b3c6e0;
+      border-radius: 7px;
+      font-size: 1.08em;
+      background: #f7fafd;
+      color: #1976d2;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%231976d2" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 22px 22px;
+      cursor: pointer;
+    }
+    #campagne-form select:focus {
+      border: 1.5px solid #1976d2;
+      background: #f0f6ff;
+      box-shadow: 0 0 0 2px #1976d233;
+    }
+    #campagne-form option {
+      color: #222;
+      background: #fff;
+      font-size: 1em;
+    }
+    @media (max-width: 700px) {
+      .campagne-container {
+        max-width: 99vw;
+        margin: 18vw 1vw 0 1vw;
+        padding: 18px 2vw 18px 2vw;
+        border-radius: 10px;
+        box-sizing: border-box;
       }
-      progressBar.style.display = 'none';
-      // Ajout campagne dans Firestore
-      await db.collection('campagnes').add({
-        distributeur,
-        partenaire,
-        email,
-        nom,
-        debut,
-        duree,
-        style,
-        type,
-        typeFichier,
-        localNational,
-        adresse,
-        contact,
-        remunerationLocal,
-        remunerationNational,
-        details,
-        images: imageUrls,
-        videos: videoUrls,
-        createdAt: new Date()
-      });
-      successDiv.textContent = 'Demande de Campagne créée avec succès !';
-      this.reset();
-    } catch (err) {
-      errorDiv.textContent = 'Erreur : ' + err.message;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Créer la campagne';
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      .logo-gmp img {
+        width: 80px;
+        padding: 4px 8px;
+      }
+      .campagne-container h1 {
+        font-size: 1.3em;
+        margin-bottom: 18px;
+      }
     }
-  });
-
-  const mediaInput = document.getElementById('media');
-  const previewDiv = document.getElementById('preview');
-  mediaInput.addEventListener('change', function() {
-    previewDiv.innerHTML = '';
-    Array.from(mediaInput.files).forEach(file => {
-      const isImage = file.type.startsWith('image/');
-      const isVideo = file.type.startsWith('video/');
-      const url = URL.createObjectURL(file);
-      if (isImage) {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = file.name;
-        previewDiv.appendChild(img);
-      } else if (isVideo) {
-        const video = document.createElement('video');
-        video.src = url;
-        video.controls = true;
-        previewDiv.appendChild(video);
+  </style>
+</head>
+<body>
+  <!-- Barre de navigation -->
+  <nav id="navbar-admin" style="width:100vw;max-width:100vw;background:#1976d2;padding:0.7em 0 0.7em 0.7em;display:flex;align-items:center;gap:1em;box-shadow:0 2px 8px #b3c6e0;position:fixed;top:0;left:0;z-index:100;">
+    <button onclick="window.history.back()" style="background:#fff;color:#1976d2;font-weight:700;border:none;border-radius:6px;padding:0.5em 1.2em;font-size:1em;box-shadow:0 1px 4px #b3c6e0;cursor:pointer;transition:background 0.15s;">← Retour</button>
+    <span style="color:#fff;font-size:1.15em;font-weight:700;letter-spacing:1px;">Créer une campagne</span>
+  </nav>
+  <div style="height:3.2em;"></div>
+  <!-- Formulaire de création de campagne -->
+  <div class="campagne-container">
+    <div class="logo-gmp">
+      <img src="gmp modif.png" alt="Logo GMP">
+      <span>GLOBAL MEDIAS PUB</span>
+    </div>
+    <h1>Créer une campagne</h1>
+    <form id="campagne-form" enctype="multipart/form-data">
+      <div class="form-row">
+        <div class="form-col">
+          <label for="distributeur">Nom du mandataire :</label>
+          <input type="text" id="distributeur" name="distributeur" required>
+        </div>
+        <div class="form-col">
+          <label for="partenaire">Nom Partenaire :</label>
+          <select id="partenaire" name="partenaire" required>
+            <option value="">Sélectionner un partenaire</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="email">Email :</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-col">
+          <label for="nom">Nom de la Campagne :</label>
+          <input type="text" id="nom" name="nom" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="debut">Début Campagne :</label>
+          <input type="date" id="debut" name="debut" required>
+        </div>
+        <div class="form-col">
+          <label for="duree">Durée de Campagne :</label>
+          <input type="text" id="duree" name="duree" placeholder="Ex: 1 Mois, 2 Semaines" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="style">Style Campagne :</label>
+          <input type="text" id="style" name="style" required>
+        </div>
+        <div class="form-col">
+          <label for="type">Type de campagne :</label>
+          <input type="text" id="type" name="type" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="typeFichier">Type de fichier reçu campagne :</label>
+          <input type="text" id="typeFichier" name="typeFichier" placeholder="Ex: image, vidéo, pdf">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="adresse">Adresse fournisseur :</label>
+          <input type="text" id="adresse" name="adresse" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="remunerationLocal">Rémunération Local (€) :</label>
+          <input type="number" id="remunerationLocal" name="remunerationLocal" min="0" step="0.01" required>
+        </div>
+        <div class="form-col">
+          <label for="remunerationNational">Rémunération National (€) :</label>
+          <input type="number" id="remunerationNational" name="remunerationNational" min="0" step="0.01" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label for="nbSocieteLocal">Nombre de société local :</label>
+          <input type="number" id="nbSocieteLocal" name="nbSocieteLocal" min="0" step="1" required>
+        </div>
+        <div class="form-col">
+          <label for="nbSocieteNational">Nombre de société national :</label>
+          <input type="number" id="nbSocieteNational" name="nbSocieteNational" min="0" step="1" required>
+        </div>
+      </div>
+      <div id="preview-total-local" style="margin:8px 0 0 0;color:#1976d2;font-weight:600;font-size:1.08em;"></div>
+      <div id="preview-total-national" style="margin:8px 0 0 0;color:#1976d2;font-weight:600;font-size:1.08em;"></div>
+      <div class="form-row">
+        <div class="form-col" style="width:100%">
+          <label for="details">Message :</label>
+          <textarea id="details" name="details" rows="4" placeholder="Exprimez-vous librement ici..." required></textarea>
+        </div>
+      </div>
+      <label for="media">Images ou vidéos :</label>
+      <input type="file" id="media" name="media" accept="image/*,video/*" multiple required>
+      <div id="preview"></div>
+      <progress id="uploadProgress" value="0" max="100" style="width:100%; display:none;"></progress>
+      <button type="submit">Créer la campagne</button>
+      <div class="success" id="success"></div>
+      <div class="error" id="error"></div>
+    </form>
+  </div>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    document.getElementById('campagne-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const successDiv = document.getElementById('success');
+      const errorDiv = document.getElementById('error');
+      const progressBar = document.getElementById('uploadProgress');
+      successDiv.textContent = '';
+      errorDiv.textContent = '';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Envoi en cours...';
+      try {
+        const distributeur = document.getElementById('distributeur').value.trim();
+        const partenaire = document.getElementById('partenaire').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const nom = document.getElementById('nom').value.trim();
+        const debut = document.getElementById('debut').value;
+        const duree = document.getElementById('duree').value.trim();
+        const style = document.getElementById('style').value.trim();
+        const type = document.getElementById('type').value.trim();
+        const typeFichier = document.getElementById('typeFichier').value.trim();
+        const adresse = document.getElementById('adresse').value.trim();
+        const remunerationLocal = document.getElementById('remunerationLocal').value.trim();
+        const remunerationNational = document.getElementById('remunerationNational').value.trim();
+        const nbSocieteLocal = document.getElementById('nbSocieteLocal').value.trim();
+        const nbSocieteNational = document.getElementById('nbSocieteNational').value.trim();
+        // Calcul des totaux
+        const totalLocal = (parseFloat(remunerationLocal.replace(',', '.')) || 0) * (parseInt(nbSocieteLocal) || 0);
+        const totalNational = (parseFloat(remunerationNational.replace(',', '.')) || 0) * (parseInt(nbSocieteNational) || 0);
+        const details = document.getElementById('details').value.trim();
+        const mediaInput = document.getElementById('media');
+        const files = Array.from(mediaInput.files);
+        if (files.length === 0) throw new Error('Veuillez sélectionner au moins un fichier image ou vidéo.');
+        // Upload media
+        const imageUrls = [];
+        const videoUrls = [];
+        for (const file of files) {
+          const ext = file.name.split('.').pop().toLowerCase();
+          const isImage = file.type.startsWith('image/');
+          const isVideo = file.type.startsWith('video/');
+          let folder = '';
+          if (isImage) folder = 'images';
+          else if (isVideo) folder = 'videos';
+          else continue; // skip unsupported
+          const storageRef = storage.ref().child(`campagnes/${folder}/${Date.now()}_${Math.floor(Math.random()*10000)}_${file.name}`);
+          progressBar.style.display = 'block';
+          progressBar.value = 0;
+          await new Promise((resolve, reject) => {
+            const uploadTask = storageRef.put(file);
+            uploadTask.on('state_changed', 
+              (snapshot) => {
+                const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progressBar.value = percent;
+              }, 
+              (error) => reject(error),
+              async () => {
+                const url = await uploadTask.snapshot.ref.getDownloadURL();
+                if (isImage) imageUrls.push(url);
+                if (isVideo) videoUrls.push(url);
+                resolve();
+              }
+            );
+          });
+        }
+        progressBar.style.display = 'none';
+        // Ajout campagne dans Firestore
+        await db.collection('campagnes').add({
+          distributeur,
+          partenaire,
+          email,
+          nom,
+          debut,
+          duree,
+          style,
+          type,
+          typeFichier,
+          adresse,
+          remunerationLocal,
+          remunerationNational,
+          nbSocieteLocal,
+          nbSocieteNational,
+          details,
+          images: imageUrls,
+          videos: videoUrls,
+          totalLocal,
+          totalNational,
+          createdAt: new Date()
+        });
+        // Ajout ou mise à jour de l'utilisateur (email et nom du mandataire)
+        if (email && distributeur) {
+          const safeEmail = email.replace(/\./g, '_dot_').replace(/@/g, '_at_');
+          await db.collection('utilisateur').doc(safeEmail).set({
+            email: email,
+            lastname: distributeur,
+            updatedAt: new Date()
+          }, { merge: true });
+        }
+        successDiv.textContent = 'Demande de Campagne créée avec succès !';
+        this.reset();
+      } catch (err) {
+        errorDiv.textContent = 'Erreur : ' + err.message;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Créer la campagne';
       }
     });
-  });
-
-  window.addEventListener('DOMContentLoaded', function() {
-    db.collection('users').where('role', '==', 'Campagne').get()
-      .then((querySnapshot) => {
-        const select = document.getElementById('partenaire');
-        select.innerHTML = '<option value="">Sélectionner un partenaire</option>';
-        let found = false;
-        querySnapshot.forEach((doc) => {
-          found = true;
-          const data = doc.data();
-          const label = data.email;
-          const option = document.createElement('option');
-          option.value = data.email;
-          option.textContent = label;
-          select.appendChild(option);
-        });
-        if (!found) {
-          const option = document.createElement('option');
-          option.value = "";
-          option.textContent = "Aucun utilisateur 'Campagne' trouvé";
-          select.appendChild(option);
+    const mediaInput = document.getElementById('media');
+    const previewDiv = document.getElementById('preview');
+    mediaInput.addEventListener('change', function() {
+      previewDiv.innerHTML = '';
+      Array.from(mediaInput.files).forEach(file => {
+        const isImage = file.type.startsWith('image/');
+        const isVideo = file.type.startsWith('video/');
+        const url = URL.createObjectURL(file);
+        if (isImage) {
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = file.name;
+          previewDiv.appendChild(img);
+        } else if (isVideo) {
+          const video = document.createElement('video');
+          video.src = url;
+          video.controls = true;
+          previewDiv.appendChild(video);
         }
-      })
-      .catch((err) => {
-        alert("Erreur Firestore : " + err.message);
       });
-  });
-</script>
+    });
+    window.addEventListener('DOMContentLoaded', function() {
+      db.collection('users').where('role', '==', 'Campagne').get()
+        .then((querySnapshot) => {
+          const select = document.getElementById('partenaire');
+          select.innerHTML = '<option value="">Sélectionner un partenaire</option>';
+          let found = false;
+          querySnapshot.forEach((doc) => {
+            found = true;
+            const data = doc.data();
+            const label = data.email;
+            const option = document.createElement('option');
+            option.value = data.email;
+            option.textContent = label;
+            select.appendChild(option);
+          });
+          if (!found) {
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "Aucun utilisateur 'Campagne' trouvé";
+            select.appendChild(option);
+          }
+        })
+        .catch((err) => {
+          alert("Erreur Firestore : " + err.message);
+        });
+    });
+    // Masquer la navbar si on ne vient pas de la page admin
+    window.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('from') !== 'admin') {
+        const navbar = document.getElementById('navbar-admin');
+        if (navbar) navbar.style.display = 'none';
+      }
+    });
+    function updateTotalLocal() {
+      const remuneration = parseFloat(document.getElementById('remunerationLocal').value.replace(',', '.')) || 0;
+      const nb = parseInt(document.getElementById('nbSocieteLocal').value) || 0;
+      const total = remuneration * nb;
+      document.getElementById('preview-total-local').textContent =
+        (remuneration && nb) ? `Total local : ${total.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2})} €` : '';
+    }
+    function updateTotalNational() {
+      const remuneration = parseFloat(document.getElementById('remunerationNational').value.replace(',', '.')) || 0;
+      const nb = parseInt(document.getElementById('nbSocieteNational').value) || 0;
+      const total = remuneration * nb;
+      document.getElementById('preview-total-national').textContent =
+        (remuneration && nb) ? `Total national : ${total.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2})} €` : '';
+    }
+    document.getElementById('remunerationLocal').addEventListener('input', updateTotalLocal);
+    document.getElementById('nbSocieteLocal').addEventListener('input', updateTotalLocal);
+    document.getElementById('remunerationNational').addEventListener('input', updateTotalNational);
+    document.getElementById('nbSocieteNational').addEventListener('input', updateTotalNational);
+  </script>
+</body>
+</html>

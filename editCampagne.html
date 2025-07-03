@@ -1,0 +1,209 @@
+<!-- Page d’édition d’une campagne -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifier une campagne</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <a href="admin.html" class="inline-block mb-4 text-blue-700 hover:underline font-semibold">&larr; Retour à l'administration</a>
+    <h1 class="mb-4 text-primary">Modifier une campagne</h1>
+    <form id="edit-campagne-form" class="bg-white p-4 rounded shadow-sm">
+      <input type="hidden" id="campagne-id">
+      <div class="mb-3">
+        <label for="nom" class="form-label">Nom de la campagne</label>
+        <input type="text" class="form-control" id="nom" required>
+      </div>
+      <div class="mb-3">
+        <label for="debut" class="form-label">Début</label>
+        <input type="date" class="form-control" id="debut" required>
+      </div>
+      <div class="mb-3">
+        <label for="duree" class="form-label">Durée</label>
+        <input type="text" class="form-control" id="duree" required>
+      </div>
+      <div class="mb-3">
+        <label for="style" class="form-label">Style</label>
+        <input type="text" class="form-control" id="style" required>
+      </div>
+      <div class="mb-3">
+        <label for="type" class="form-label">Type</label>
+        <input type="text" class="form-control" id="type" required>
+      </div>
+      <div class="mb-3">
+        <label for="details" class="form-label">Message</label>
+        <textarea class="form-control" id="details" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="distributeur" class="form-label">Distributeur</label>
+        <input type="text" class="form-control" id="distributeur">
+      </div>
+      <div class="mb-3">
+        <label for="partenaire" class="form-label">Partenaire</label>
+        <input type="text" class="form-control" id="partenaire">
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email">
+      </div>
+      <div class="mb-3">
+        <label for="fin" class="form-label">Fin</label>
+        <input type="date" class="form-control" id="fin">
+      </div>
+      <div class="mb-3">
+        <label for="zone" class="form-label">Zone</label>
+        <input type="text" class="form-control" id="zone">
+      </div>
+      <div class="mb-3">
+        <label for="typeFichier" class="form-label">Type de fichier</label>
+        <input type="text" class="form-control" id="typeFichier">
+      </div>
+      <div class="mb-3">
+        <label for="localNational" class="form-label">Local/National</label>
+        <input type="text" class="form-control" id="localNational">
+      </div>
+      <div class="mb-3">
+        <label for="adresse" class="form-label">Adresse fournisseur</label>
+        <input type="text" class="form-control" id="adresse">
+      </div>
+      <div class="mb-3">
+        <label for="contact" class="form-label">Contact</label>
+        <input type="text" class="form-control" id="contact">
+      </div>
+      <div class="mb-3">
+        <label for="remunerationLocal" class="form-label">Rémunération Local (€)</label>
+        <input type="number" step="0.01" class="form-control" id="remunerationLocal">
+      </div>
+      <div class="mb-3">
+        <label for="nbSocieteLocal" class="form-label">Nombre société local</label>
+        <input type="number" class="form-control" id="nbSocieteLocal">
+      </div>
+      <div class="mb-3">
+        <label for="totalLocal" class="form-label">Total Local (€)</label>
+        <input type="number" step="0.01" class="form-control" id="totalLocal" readonly>
+      </div>
+      <div class="mb-3">
+        <label for="remunerationNational" class="form-label">Rémunération National (€)</label>
+        <input type="number" step="0.01" class="form-control" id="remunerationNational">
+      </div>
+      <div class="mb-3">
+        <label for="nbSocieteNational" class="form-label">Nombre société national</label>
+        <input type="number" class="form-control" id="nbSocieteNational">
+      </div>
+      <div class="mb-3">
+        <label for="totalNational" class="form-label">Total National (€)</label>
+        <input type="number" step="0.01" class="form-control" id="totalNational" readonly>
+      </div>
+      <div class="mb-3">
+        <label for="images" class="form-label">Images (URLs, séparées par des virgules)</label>
+        <input type="text" class="form-control" id="images">
+      </div>
+      <div class="mb-3">
+        <label for="videos" class="form-label">Vidéos (URLs, séparées par des virgules)</label>
+        <input type="text" class="form-control" id="videos">
+      </div>
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <a href="admin.html#campagnes" class="btn btn-secondary ms-2">Annuler</a>
+      <div id="success" class="text-success mt-3"></div>
+      <div id="error" class="text-danger mt-2"></div>
+    </form>
+  </div>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const params = new URLSearchParams(window.location.search);
+    const campagneId = params.get('id');
+    const form = document.getElementById('edit-campagne-form');
+    const successDiv = document.getElementById('success');
+    const errorDiv = document.getElementById('error');
+    if (!campagneId) {
+      errorDiv.textContent = "Aucune campagne sélectionnée.";
+      form.style.display = 'none';
+    } else {
+      db.collection('campagnes').doc(campagneId).get().then(doc => {
+        if (!doc.exists) {
+          errorDiv.textContent = "Campagne introuvable.";
+          form.style.display = 'none';
+          return;
+        }
+        const d = doc.data();
+        document.getElementById('campagne-id').value = campagneId;
+        document.getElementById('nom').value = d.nom || '';
+        document.getElementById('debut').value = d.debut || '';
+        document.getElementById('duree').value = d.duree || '';
+        document.getElementById('style').value = d.style || '';
+        document.getElementById('type').value = d.type || '';
+        document.getElementById('details').value = d.details || '';
+        document.getElementById('distributeur').value = d.distributeur || '';
+        document.getElementById('partenaire').value = d.partenaire || '';
+        document.getElementById('email').value = d.email || '';
+        document.getElementById('fin').value = d.fin || '';
+        document.getElementById('zone').value = d.zone || '';
+        document.getElementById('typeFichier').value = d.typeFichier || '';
+        document.getElementById('localNational').value = d.localNational || '';
+        document.getElementById('adresse').value = d.adresse || '';
+        document.getElementById('contact').value = d.contact || '';
+        document.getElementById('remunerationLocal').value = d.remunerationLocal || '';
+        document.getElementById('nbSocieteLocal').value = d.nbSocieteLocal || '';
+        document.getElementById('totalLocal').value = d.totalLocal || '';
+        document.getElementById('remunerationNational').value = d.remunerationNational || '';
+        document.getElementById('nbSocieteNational').value = d.nbSocieteNational || '';
+        document.getElementById('totalNational').value = d.totalNational || '';
+        document.getElementById('images').value = (d.images||[]).join(', ');
+        document.getElementById('videos').value = (d.videos||[]).join(', ');
+      });
+    }
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      successDiv.textContent = '';
+      errorDiv.textContent = '';
+      const remunerationLocal = parseFloat(document.getElementById('remunerationLocal').value.replace(',', '.')) || 0;
+      const nbSocieteLocal = parseInt(document.getElementById('nbSocieteLocal').value) || 0;
+      const totalLocal = remunerationLocal * nbSocieteLocal;
+      const remunerationNational = parseFloat(document.getElementById('remunerationNational').value.replace(',', '.')) || 0;
+      const nbSocieteNational = parseInt(document.getElementById('nbSocieteNational').value) || 0;
+      const totalNational = remunerationNational * nbSocieteNational;
+      document.getElementById('totalLocal').value = totalLocal;
+      document.getElementById('totalNational').value = totalNational;
+      const data = {
+        nom: document.getElementById('nom').value.trim(),
+        debut: document.getElementById('debut').value,
+        duree: document.getElementById('duree').value.trim(),
+        style: document.getElementById('style').value.trim(),
+        type: document.getElementById('type').value.trim(),
+        details: document.getElementById('details').value.trim(),
+        distributeur: document.getElementById('distributeur').value.trim(),
+        partenaire: document.getElementById('partenaire').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        fin: document.getElementById('fin').value,
+        zone: document.getElementById('zone').value.trim(),
+        typeFichier: document.getElementById('typeFichier').value.trim(),
+        localNational: document.getElementById('localNational').value.trim(),
+        adresse: document.getElementById('adresse').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        remunerationLocal,
+        nbSocieteLocal,
+        totalLocal,
+        remunerationNational,
+        nbSocieteNational,
+        totalNational,
+        images: document.getElementById('images').value.split(',').map(s=>s.trim()).filter(Boolean),
+        videos: document.getElementById('videos').value.split(',').map(s=>s.trim()).filter(Boolean)
+      };
+      db.collection('campagnes').doc(campagneId).update(data)
+        .then(() => {
+          successDiv.textContent = "Modifications enregistrées !";
+        })
+        .catch(err => {
+          errorDiv.textContent = "Erreur : " + err.message;
+        });
+    };
+  </script>
+</body>
+</html>

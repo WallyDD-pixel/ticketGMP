@@ -1,6 +1,7 @@
 const functions = require('firebase-functions/v2');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
+const cors = require('cors')({origin: true});
 
 admin.initializeApp();
 
@@ -54,43 +55,45 @@ exports.sendTicketReplyNotification = functions.firestore.onDocumentCreated(
 );
 
 // --- Création d'utilisateur par un admin via requête HTTP sécurisée ---
-exports.createUser = functions.https.onRequest(async (req, res) => {
-  if (req.method !== "POST") {
-    return res.status(405).send({ error: "Méthode non autorisée" });
-  }
+exports.createUser = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send({ error: "Méthode non autorisée" });
+    }
 
-  // Authentification admin via token Firebase
-  const idToken = req.headers.authorization && req.headers.authorization.startsWith("Bearer ")
-    ? req.headers.authorization.split("Bearer ")[1]
-    : null;
-  if (!idToken) {
-    return res.status(401).send({ error: "Non authentifié" });
-  }
+    // Authentification admin via token Firebase
+    const idToken = req.headers.authorization && req.headers.authorization.startsWith("Bearer ")
+      ? req.headers.authorization.split("Bearer ")[1]
+      : null;
+    if (!idToken) {
+      return res.status(401).send({ error: "Non authentifié" });
+    }
 
-  let decodedToken;
-  try {
-    decodedToken = await admin.auth().verifyIdToken(idToken);
-    // Pour plus de sécurité, tu peux vérifier un custom claim admin ici
-    // if (!decodedToken.admin) return res.status(403).send({ error: "Accès refusé" });
-  } catch (err) {
-    return res.status(401).send({ error: "Token invalide" });
-  }
+    let decodedToken;
+    try {
+      decodedToken = await admin.auth().verifyIdToken(idToken);
+      // Pour plus de sécurité, tu peux vérifier un custom claim admin ici
+      // if (!decodedToken.admin) return res.status(403).send({ error: "Accès refusé" });
+    } catch (err) {
+      return res.status(401).send({ error: "Token invalide" });
+    }
 
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).send({ error: "Email et mot de passe requis" });
-  }
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).send({ error: "Email et mot de passe requis" });
+    }
 
-  try {
-    const userRecord = await admin.auth().createUser({ email, password });
-    await admin.firestore().collection("users").doc(userRecord.uid).set({
-      email,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-    return res.send({ success: true, uid: userRecord.uid });
-  } catch (err) {
-    return res.status(400).send({ error: err.message });
-  }
+    try {
+      const userRecord = await admin.auth().createUser({ email, password });
+      await admin.firestore().collection("users").doc(userRecord.uid).set({
+        email,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      return res.send({ success: true, uid: userRecord.uid });
+    } catch (err) {
+      return res.status(400).send({ error: err.message });
+    }
+  });
 });
 
 // Nouvelle fonction : Envoi automatique de newsletters

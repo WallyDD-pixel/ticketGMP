@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture Campagne</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .facture-box { border: 1px solid #ccc; padding: 32px; max-width: 600px; margin: auto; }
+    h1 { text-align: center; }
+    .facture-details { margin-bottom: 24px; }
+    .facture-details td { padding: 4px 8px; }
+    .total { font-size: 1.2em; font-weight: bold; }
+    .print-btn { margin-top: 24px; display: block; width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="facture-box" style="background:#fff;box-shadow:0 2px 16px #0001;border-radius:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <img src="gmp modif.png" alt="Logo" style="height:60px;width:60px;border-radius:8px;background:#f5f5f5;padding:6px;box-shadow:0 1px 4px #0002;">
+      <div style="text-align:right;">
+        <div style="font-size:1.3em;font-weight:bold;color:#1976d2;">GLOBAL MEDIAS PUB</div>
+        <div style="font-size:0.95em;color:#888;">Facture n° <span id="factureNum"></span></div>
+        <div style="font-size:0.95em;color:#888;">Date : <span id="dateFacture"></span></div>
+      </div>
+    </div>
+    <hr style="margin-bottom:24px;">
+    <div style="margin-bottom:18px;">
+      <div style="font-weight:bold;font-size:1.1em;">Informations client</div>
+      <div>Distributeur : <span id="distributeur"></span></div>
+      <div>Partenaire : <span id="partenaire"></span></div>
+      <div>Email : <span id="email"></span></div>
+      <div>Adresse : <span id="adresse"></span></div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-weight:bold;font-size:1.1em;">Détails de la campagne</div>
+      <div>Campagne : <span id="campagneNom"></span></div>
+      <div>Début : <span id="debut"></span></div>
+      <div>Durée : <span id="duree"></span></div>
+      <div>Message : <span id="details"></span></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+      <thead>
+        <tr style="background:#f0f4fa;color:#1976d2;">
+          <th style="padding:8px;border:1px solid #e3eaf5;">Type</th>
+          <th style="padding:8px;border:1px solid #e3eaf5;">Rémunération</th>
+          <th style="padding:8px;border:1px solid #e3eaf5;">Nb sociétés</th>
+          <th style="padding:8px;border:1px solid #e3eaf5;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px;border:1px solid #e3eaf5;">Local</td>
+          <td style="padding:8px;border:1px solid #e3eaf5;" id="remunerationLocal"></td>
+          <td style="padding:8px;border:1px solid #e3eaf5;" id="nbSocieteLocal"></td>
+          <td style="padding:8px;border:1px solid #e3eaf5;" id="totalLocal"></td>
+        </tr>
+        <tr>
+          <td style="padding:8px;border:1px solid #e3eaf5;">National</td>
+          <td style="padding:8px;border:1px solid #e3eaf5;" id="remunerationNational"></td>
+          <td style="padding:8px;border:1px solid #e3eaf5;" id="nbSocieteNational"></td>
+          <td style="padding:8px;border:1px solid #e3eaf5;" id="totalNational"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="text-align:right;font-size:1.2em;font-weight:bold;margin-bottom:12px;">Montant total à payer : <span id="montant"></span> €</div>
+    <button class="print-btn" onclick="window.print()" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:12px 0;font-size:1em;">Imprimer la facture</button>
+    <button id="downloadBtn" style="background:#43a047;color:#fff;border:none;border-radius:6px;padding:12px 0;font-size:1em;width:100%;margin-top:10px;">Télécharger la facture (PDF)</button>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // Récupère l'id de la campagne depuis l'URL
+    const params = new URLSearchParams(window.location.search);
+    const campagneId = params.get('id');
+    document.getElementById('dateFacture').textContent = new Date().toLocaleDateString('fr-FR');
+
+    if (campagneId) {
+      const db = firebase.firestore();
+      db.collection('campagnes').doc(campagneId).get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('campagneNom').textContent = data.nom || '';
+          document.getElementById('distributeur').textContent = data.distributeur || '';
+          document.getElementById('partenaire').textContent = data.partenaire || '';
+          document.getElementById('email').textContent = data.email || '';
+          document.getElementById('debut').textContent = data.debut || '';
+          document.getElementById('duree').textContent = data.duree || '';
+          document.getElementById('adresse').textContent = data.adresse || '';
+          document.getElementById('remunerationLocal').textContent = data.remunerationLocal || '';
+          document.getElementById('nbSocieteLocal').textContent = data.nbSocieteLocal || '';
+          document.getElementById('totalLocal').textContent = data.totalLocal !== undefined ? data.totalLocal : '';
+          document.getElementById('remunerationNational').textContent = data.remunerationNational || '';
+          document.getElementById('nbSocieteNational').textContent = data.nbSocieteNational || '';
+          document.getElementById('totalNational').textContent = data.totalNational !== undefined ? data.totalNational : '';
+          document.getElementById('details').textContent = data.details || '';
+          let montant = data.montant;
+          if (!montant) {
+            // Si montant absent, on additionne totalLocal et totalNational
+            const totalLocal = parseFloat(data.totalLocal) || 0;
+            const totalNational = parseFloat(data.totalNational) || 0;
+            montant = totalLocal + totalNational;
+          }
+          document.getElementById('montant').textContent = montant;
+          // Numéro de facture simple basé sur l'ID ou la date
+          document.getElementById('factureNum').textContent = doc.id.substring(0,8).toUpperCase();
+        } else {
+          document.getElementById('factureDetails').innerHTML = '<tr><td colspan="2">Campagne introuvable.</td></tr>';
+        }
+      });
+    } else {
+      document.getElementById('factureDetails').innerHTML = '<tr><td colspan="2">Aucune campagne sélectionnée.</td></tr>';
+    }
+
+    document.getElementById('downloadBtn').onclick = function() {
+      const factureBox = document.querySelector('.facture-box');
+      html2canvas(factureBox, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+        // Calculer la taille pour remplir la largeur de la page
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth - 40; // marges
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let y = 20;
+        pdf.addImage(imgData, 'PNG', 20, y, imgWidth, imgHeight);
+        pdf.save('facture_' + (document.getElementById('campagneNom').textContent || 'campagne') + '.pdf');
+      });
+    };
+  </script>
+</body>
+</html>
